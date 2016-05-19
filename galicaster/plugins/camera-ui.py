@@ -22,13 +22,15 @@ def post_init(source=None):
     global recorder_ui, edit_button
 
     conf = context.get_conf()
-    recorder_ui = context.get_mainwindow().nbox.get_nth_page(0)
-    edit_button =  recorder_ui.gui.get_object("editbutton")
-    edit_button.connect('clicked', on_edit_meta)
-    edit_button.handler_block_by_func(recorder_ui.on_edit_meta)
+    recorder_ui = context.get_mainwindow().nbox.get_nth_page(0).gui
+    buttonbox = recorder_ui.get_object("buttonbox")
+    new_button = Gtk.Button.new_with_label("config")
+    new_button.connect('clicked', open_config)
+    new_button.show_all()
+    buttonbox.add(new_button)
 
 
-def on_edit_meta(button):
+def open_config(button):
     win = Gtk.Window.new(Gtk.WindowType.TOPLEVEL)
     win.set_border_width(10)
     hbox = Gtk.Box(spacing=6)

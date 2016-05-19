@@ -126,8 +126,8 @@ class GCpulse(Gst.Bin, base.Base):
         else:
             aux = aux.replace("gc-audio-mux !", "")
 
-        #bin = Gst.parse_bin_from_description(aux, True)
-        bin = Gst.parse_launch("( {} )".format(aux))
+        bin = Gst.parse_bin_from_description(aux, True)
+        #bin = Gst.parse_launch("( {} )".format(aux))
         self.add(bin)
 
         if self.options['location'] != "default":
