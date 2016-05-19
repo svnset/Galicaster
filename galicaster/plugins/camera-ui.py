@@ -24,7 +24,9 @@ def post_init(source=None):
     conf = context.get_conf()
     recorder_ui = context.get_mainwindow().nbox.get_nth_page(0).gui
     buttonbox = recorder_ui.get_object("buttonbox")
-    new_button = Gtk.Button.new_with_label("config")
+    image = recorder_ui.get_object("moreimage")
+    new_button = Gtk.Button.new()
+    new_button.set_image(image)
     new_button.connect('clicked', open_config)
     new_button.show_all()
     buttonbox.add(new_button)
@@ -36,6 +38,8 @@ def open_config(button):
     hbox = Gtk.Box(spacing=6)
     win.add(hbox)
 
+
+    #testing optional buttons
     button = Gtk.Button.new_with_label("Click Me")
     button.connect("clicked", on_click_me_clicked)
     hbox.pack_start(button, True, True, 0)
