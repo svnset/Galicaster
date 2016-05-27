@@ -225,8 +225,8 @@ class GCblackmagic(Gst.Bin, base.Base):
           aux = aux.replace('gc-asink', gcaudiosink)
           aux = aux.replace('gc-blackmagic-audioenc', self.options['audioencoder'])
 
-        #bin = Gst.parse_bin_from_description(aux, False)
-        bin = Gst.parse_launch("( {} )".format(aux))
+        bin = Gst.parse_bin_from_description(aux, False)
+        #bin = Gst.parse_launch("( {} )".format(aux))
         self.add(bin)
 
         sink = self.get_by_name('gc-blackmagic-sink')
