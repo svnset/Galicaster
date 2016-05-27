@@ -15,9 +15,9 @@ UI for a Metadata Editor Pop UP
 """
 
 from gi.repository import Gtk, Gdk
-import datetime
-from os import path
 from gi.repository import GObject
+
+import datetime
 import os
 
 from galicaster.classui.calendarwindow import CalendarWindow
@@ -84,9 +84,9 @@ class MetadataClass(Gtk.Widget):
         gui.get_object("clabel").set_label(ko_label)
 
         dialog.set_property("width-request",int(anchura/2.2))
-        dialog.set_type_hint(Gdk.WindowTypeHint.TOOLBAR)
-        dialog.set_modal(True)
-        dialog.set_keep_above(False)
+        #dialog.set_type_hint(Gdk.WindowTypeHint.TOOLBAR)
+        #dialog.set_modal(True)
+        #dialog.set_keep_above(False)
 
         #NEW HEADER
         strip = Header(size=size, title=title)
@@ -94,7 +94,8 @@ class MetadataClass(Gtk.Widget):
         dialog.vbox.reorder_child(strip,0)
 
         if parent != None:
-            dialog.set_transient_for(parent.get_toplevel())
+            #dialog.set_transient_for(parent.get_toplevel())
+            dialog.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
             dialog_style_context = dialog.get_style_context()
             window_classes = parent.get_style_context().list_classes()
             for style_class in window_classes:
@@ -104,8 +105,6 @@ class MetadataClass(Gtk.Widget):
         table = gui.get_object('infobox')
         dialog.vbox.set_child_packing(table, True, True, int(self.hprop*25), Gtk.PackType.END)
         title = gui.get_object('title')
-        sl = gui.get_object('slabel')
-        cl = gui.get_object('clabel')
         talign = gui.get_object('table_align')
 
         title.hide()
@@ -143,9 +142,11 @@ class MetadataClass(Gtk.Widget):
         dialog.vbox.set_child_packing(dialog.action_area, True, True, int(self.hprop*25), Gtk.PackType.END)
         dialog.show_all()
 
+        parent.get_style_context().add_class('shaded')
         self.return_value = dialog.run()
         if self.return_value == -8:
             self.update_metadata(table,package)
+        parent.get_style_context().remove_class('shaded')
         dialog.destroy()
 
 

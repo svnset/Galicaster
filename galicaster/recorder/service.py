@@ -109,6 +109,7 @@ class RecorderService(object):
 
         
         self.recorder = self.__recorderklass(bins)
+        self.dispatcher.emit("recorder-ready")
 
         self.mute_preview(self.mute)
         if self.__create_drawing_areas_func:
@@ -118,6 +119,8 @@ class RecorderService(object):
             
 
     def record(self, mp=None):
+        self.dispatcher.emit("recorder-starting")
+
         self.logger.info("Recording (current status: {})".format(self.status))
         if self.status in (INIT_STATUS, ERROR_STATUS):
             self.logger.warning("Cancel recording: status error (in {})".format(self.status))
@@ -149,6 +152,9 @@ class RecorderService(object):
         self.current_mediapackage.setDate(now)
         self.__set_status(RECORDING_STATUS)
         self.dispatcher.emit("recorder-started", self.current_mediapackage.getIdentifier())
+
+        # Save current tmp data
+        self.repo.save_current_mp_data(self.current_mediapackage, self.recorder.get_bins_info())
 
         return True
 
@@ -190,8 +196,14 @@ class RecorderService(object):
 
     def pause(self):
         self.logger.info("Pausing recorder")
+
         if self.status == RECORDING_STATUS:
-            self.recorder.pause()
+            # Recorder mode (pausetype: pipeline (default value) or recording)
+            if self.conf.get_choice('recorder', 'pausetype', ['pipeline', 'recording'] , 'pipeline') == 'pipeline':
+                self.recorder.pause()
+            else:
+                self.recorder.pause_recording()
+        
             self.__set_status(PAUSED_STATUS)
             return True
         self.logger.warning("Cancel pause: status error (in {})".format(self.status))
@@ -201,7 +213,12 @@ class RecorderService(object):
     def resume(self):
         self.logger.info("Resuming recorder")
         if self.status == PAUSED_STATUS:
-            self.recorder.resume()
+            # Recorder mode (pausetype: pipeline (default value) or recording)
+            if self.conf.get_choice('recorder', 'pausetype', ['pipeline', 'recording'] , 'pipeline') == 'pipeline':
+                self.recorder.resume()
+            else:
+                self.recorder.resume_recording()
+            
             self.__set_status(RECORDING_STATUS)
             return True
         self.logger.warning("Cancel resume: status error (in {})".format(self.status))
@@ -236,7 +253,7 @@ class RecorderService(object):
 
     def _handle_error(self, origin, error_msg):
         self.logger.error("Handle error ({})". format(error_msg))
-        self.current_mediapackage = None
+        # self.current_mediapackage = None
         if self.recorder:
             self.recorder.stop(True)
         self.error_msg = error_msg

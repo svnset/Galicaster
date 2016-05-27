@@ -15,8 +15,8 @@ from gi.repository import Gtk
 from gi.repository import GObject
 from gi.repository import Pango
 
+from galicaster import __version__
 from galicaster.classui.managerui import ManagerUI
-from galicaster.classui import message
 from galicaster.core import context
 from galicaster.mediapackage import mediapackage
 from galicaster.classui import get_ui_path
@@ -55,6 +55,9 @@ class ListingClassUI(ManagerUI):
         self.fill_menu()
         builder = Gtk.Builder()
         builder.add_from_file(get_ui_path('listing.glade'))
+        release = builder.get_object("release_label")
+        release.set_label("Galicaster "+__version__)
+
         self.gui = builder
 
         self.box = builder.get_object("listingbox")
@@ -66,16 +69,17 @@ class ListingClassUI(ManagerUI):
         self.color = context.get_conf().get_palette(old_style)
 
         builder.connect_signals(self)
-        self.dispatcher.connect("action-mm-refresh-row", self.refresh_row_from_mp)
-        self.dispatcher.connect("operation-started", self.refresh_operation)
-        self.dispatcher.connect("operation-stopped", self.refresh_operation)
-        self.dispatcher.connect("view-changed", self.event_change_mode)
+        self.dispatcher.connect_ui("action-mm-refresh-row", self.refresh_row_from_mp)
+        self.dispatcher.connect_ui("operation-started", self.refresh_operation)
+        self.dispatcher.connect_ui("operation-stopped", self.refresh_operation)
+        self.dispatcher.connect_ui("view-changed", self.event_change_mode)
 
         self.populate_treeview(self.repository.list().values())
         self.box.pack_start(self.strip,False,False,0)
         self.box.reorder_child(self.strip,0)
         self.box.show()
         self.pack_start(self.box,True,True,0)
+
 
 
     def event_change_mode(self, orig, old_state, new_state):
@@ -129,8 +133,8 @@ class ListingClassUI(ManagerUI):
         self.renders[8].set_property('xalign',0.5)
 
 
-        vbar = self.scroll.get_vscrollbar()
-    #	vbar.set_update_policy(Gtk.UPDATE_DELAYED)
+        # vbar = self.scroll.get_vscrollbar()
+        # vbar.set_update_policy(Gtk.UPDATE_DELAYED)
 
         # Create each column
         #columna5 = Gtk.TreeViewColumn("Id",render5,text = 0, background= 8)
@@ -287,7 +291,9 @@ class ListingClassUI(ManagerUI):
                 iterator=self.lista.get_iter(row)
             iters.append(iterator)
             for i in iters:
-                self.on_delete(self.lista,i)
+                #self.on_delete(self.lista,i)
+                key = self.lista[i][0]
+                self.delete(key,self.create_delete_dialog_response(self.lista, i))
             #TODO connect "row-deleted" to delete package
         elif action == "operations_action":
             self.vista.get_selection().selected_foreach(self.on_ingest_question)
@@ -342,14 +348,20 @@ class ListingClassUI(ManagerUI):
         self.refresh_row(reference,iterator)
         return True
 
-    def on_delete(self,store,iterator):
-        """Remove a mediapackage from the view list"""
-        key = store[iterator][0]
-        response = self.delete(key)
-        if response:
-            self.lista.remove(iterator)
-            self.vista.get_selection().select_path(0)
-        return True
+    #def on_delete(self,store,iterator):
+    #    """Remove a mediapackage from the view list"""
+    #    key = store[iterator][0]
+    #    response = self.delete(key,self.create_delete_dialog_response(store, iterator))
+
+    def create_delete_dialog_response(self, store, iterator):
+
+        def on_delete_dialog_response(response_id, **kwargs):
+            if response_id in message.POSITIVE:
+                self.repository.delete(self.repository.get(store[iterator][0]))
+                self.lista.remove(iterator)
+                self.vista.get_selection().select_path(0)
+
+        return on_delete_dialog_response
 
     def on_play(self,store,reference,iterator):
         """ Retrieve mediapackage and send videos to player"""

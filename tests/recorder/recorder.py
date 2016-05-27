@@ -41,8 +41,8 @@ class TestFunctions(TestCase, Base):
         self.assertRaises(TypeError, Recorder)
         self.assertRaises(TypeError, Recorder, [])
         self.assertRaises(NameError, Recorder, [{'name': 'name'}])
-        self.assertRaises(KeyError, Recorder, [{'type': 'v4l2', 'caps': 'raw'}])
-        self.assertRaises(KeyError, Recorder, [{'device': 'v4l2', 'caps': 'raw'}])
+        self.assertRaises(NameError, Recorder, [{'type': 'v4l2', 'caps': 'raw'}])
+        self.assertRaises(NameError, Recorder, [{'device': 'v4l2', 'caps': 'raw'}])
 
         #valid
         Recorder(self.getVideoTestBin())
@@ -89,7 +89,7 @@ class TestFunctions(TestCase, Base):
         bins = self.getVideoTestBin() + self.getOtherVideoTestBin() + self.getAudioTestBin()
         Base.test_record_multi(self, bins)
 
-
+        
     def test_stop_on_paused(self):
         bins = self.getVideoTestBin()
         Base.test_stop_on_paused(self, bins)
@@ -106,4 +106,10 @@ class TestFunctions(TestCase, Base):
         bins = self.getVideoTestBin()
         Base.test_pause_error(self, bins)
 
+    def test_pause_only_recording(self):
+        bins = self.getVideoTestBin()
+        Base.test_pause_only_recording(self, bins)
 
+    def test_pause_only_recording_and_stop(self):
+        bins = self.getVideoTestBin()
+        Base.test_pause_only_recording_and_stop(self, bins)

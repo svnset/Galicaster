@@ -32,6 +32,7 @@ from gi.repository import Gtk, Gdk, GdkPixbuf
 from gi.repository import Pango
 import datetime
 
+from galicaster import __version__
 from galicaster.core import context
 
 from galicaster.classui.metadata import MetadataClass as Metadata
@@ -90,9 +91,10 @@ class RecorderClassUI(Gtk.Box):
        
 	builder = Gtk.Builder()
         builder.add_from_file(get_ui_path('recorder.glade'))
+        release = builder.get_object("release_label")
+        release.set_label("Galicaster "+__version__)
         
         # TEST
-        recorderui = builder.get_object("recorderbox")
         self.repo = context.get_repository()
         self.dispatcher = context.get_dispatcher()
         self.worker = context.get_worker()
@@ -129,24 +131,24 @@ class RecorderClassUI(Gtk.Box):
         big_status = builder.get_object("bg_status")
         self.view = self.set_status_view()
         big_status.add(self.view)
-        self.dispatcher.connect("init", self.check_status_area)
-        self.dispatcher.connect("init", self.check_net)
-        self.dispatcher.connect("opencast-connected", self.check_net, True)        
-        self.dispatcher.connect("opencast-unreachable", self.check_net, False)        
+        self.dispatcher.connect_ui("init", self.check_status_area)
+        self.dispatcher.connect_ui("init", self.check_net)
+        self.dispatcher.connect_ui("opencast-connected", self.check_net, True)        
+        self.dispatcher.connect_ui("opencast-unreachable", self.check_net, False)        
 
         # UI
         self.pack_start(self.recorderui,True,True,0)
 
         # Event Manager       
-        self.dispatcher.connect("recorder-vumeter", self.set_vumeter)
-        self.dispatcher.connect("view-changed", self.event_change_mode)
-        self.dispatcher.connect("recorder-status", self.handle_status)
+        self.dispatcher.connect_ui("recorder-vumeter", self.set_vumeter)
+        self.dispatcher.connect_ui("view-changed", self.event_change_mode)
+        self.dispatcher.connect_ui("recorder-status", self.handle_status)
 
         nb=builder.get_object("data_panel")
-        pages = nb.get_n_pages()        
-        for index in range(pages):
-            page=nb.get_nth_page(index)
-#            nb.set_tab_label_packing(page, True, True,Gtk.PackType.START)
+        # pages = nb.get_n_pages()        
+        # for index in range(pages):
+        #     page=nb.get_nth_page(index)
+        #     nb.set_tab_label_packing(page, True, True,Gtk.PackType.START)
 
         # STATES
         self.previous = None
@@ -227,7 +229,6 @@ class RecorderClassUI(Gtk.Box):
     def on_rec(self,button=None): 
         """GUI callback for manual recording"""
         logger.info("Recording")
-        self.dispatcher.emit("recorder-starting")
         self.recorder.record()
 
 
@@ -276,11 +277,16 @@ class RecorderClassUI(Gtk.Box):
                     "main" : _("Are you sure you want to\nstop the recording?")}
             buttons = (Gtk.STOCK_STOP, Gtk.ResponseType.OK, Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT)
             self.dispatcher.emit("action-audio-disable-msg")
-            warning = message.PopUp(message.WARN_STOP, text,
-              context.get_mainwindow(), buttons)
+            #warning = message.PopUp(message.WARN_STOP, text,
+            #  context.get_mainwindow(), buttons)
+            message.PopUp(message.WARN_STOP, text,
+                          context.get_mainwindow(), buttons, self.on_stop_dialog_response)
             self.dispatcher.emit("action-audio-enable-msg")
-            if warning.response not in message.POSITIVE or self.recorder.status not in [RECORDING_STATUS]:
-                return False
+            #if warning.response not in message.POSITIVE or self.recorder.status not in [RECORDING_STATUS]:
+            #    return False
+
+    def on_stop_dialog_response(self, response_id, **kwargs):
+        """ Manage the response of the WARN_STOP dialog """
         self.recorder.stop()
 
 
@@ -316,7 +322,7 @@ class RecorderClassUI(Gtk.Box):
 
     def destroy_error_dialog(self):
         if self.error_dialog:
-            self.error_dialog.error_dialog_destroy()
+            self.error_dialog.dialog_destroy()
             self.error_dialog = None
         
 
@@ -492,10 +498,9 @@ class RecorderClassUI(Gtk.Box):
         main_window = context.get_mainwindow()
         main_window.realize()
         
-        style=main_window.get_style()
-
-#        bgcolor = style.bg[Gtk.StateType.PRELIGHT]  
-#        fgcolor = style.fg[Gtk.StateType.PRELIGHT]  
+        # style=main_window.get_style()
+        # bgcolor = style.bg[Gtk.StateType.PRELIGHT]  
+        # fgcolor = style.fg[Gtk.StateType.PRELIGHT]  
 
         for i in STATUS:
             if i[0] in ["Recording", "Error"]:
@@ -592,7 +597,6 @@ class RecorderClassUI(Gtk.Box):
         pbox = self.gui.get_object("prebox")
 
         rec_title = self.gui.get_object("recording1")
-        rec_elapsed = self.gui.get_object("recording3")
         status_panel = self.gui.get_object('status_panel')
 
         l1 = self.gui.get_object("tab1")
@@ -619,7 +623,6 @@ class RecorderClassUI(Gtk.Box):
         relabel(rec_title, k1*25, True)
         rec_title.set_line_wrap(True)
         rec_title.set_width_chars(40)
-        ###FIXME UI relabel(rec_elapsed, k1*28, True)
 
         for child in status_panel.get_children():
             if type(child) is Gtk.Label:
@@ -662,11 +665,6 @@ class RecorderClassUI(Gtk.Box):
             if type(image[0]) == Gtk.Image:
                 image[0].set_pixel_size(int(k1*56))  
 
-
-        talign = self.gui.get_object("top_align")
-        talign.set_padding(int(k1*10),int(k1*25),0,0)
-        calign = self.gui.get_object("control_align")
-        calign.set_padding(int(k1*10),int(k1*30),0,0)
         vum = self.gui.get_object("vubox")
         vum.set_padding(int(k1*20),int(k1*10),0,0)         
         pbox.set_property("width-request", int(k1*225) )        
@@ -697,7 +695,6 @@ class RecorderClassUI(Gtk.Box):
         elif status == PREVIEW_STATUS:
             record.set_sensitive( (self.allow_start or self.allow_manual) )
             pause.set_sensitive(False)
-            pause.set_active(False)
             stop.set_sensitive(False)
             helpb.set_sensitive(True)
             prevb.set_sensitive(True)

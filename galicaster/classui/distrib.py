@@ -12,9 +12,7 @@
 # San Francisco, California, 94105, USA.
 
 
-from os import path
-from gi.repository import Gtk, GObject, GdkPixbuf
-from gi.repository import Pango
+from gi.repository import Gtk, GdkPixbuf
 
 from galicaster.core import context
 from galicaster.classui import get_ui_path, get_image_path
@@ -51,7 +49,7 @@ class DistribUI(Gtk.Box):
         
         #Connect signals
         dispatcher = context.get_dispatcher()
-        dispatcher.connect("action-reload-profile", self.update_selected_profile)
+        dispatcher.connect_ui("action-reload-profile", self.update_selected_profile)
         recorder.connect("clicked", self.emit_signal, "action-view-change", 0)
         manager.connect("clicked", self.emit_signal, "action-view-change", 1)
         quit_button.connect("clicked", self.emit_signal, "action-quit")

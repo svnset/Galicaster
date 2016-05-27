@@ -15,7 +15,6 @@ UI for the player area
 """
 
 
-from os import path
 from gi.repository import GObject
 from gi.repository import Gtk, Gdk
 from gi.repository import Gst
@@ -27,10 +26,9 @@ try:
 except ImportError:
     OrderedDict = dict
 
-
+from galicaster import __version__
 from galicaster.player import Player
 from galicaster.core import context
-from galicaster.mediapackage import mediapackage
 from galicaster.classui.managerui import ManagerUI
 from galicaster.classui import get_ui_path
 
@@ -58,6 +56,9 @@ class PlayerClassUI(ManagerUI):
         ManagerUI.__init__(self,1)
 	builder = Gtk.Builder()
         builder.add_from_file(get_ui_path('player.glade'))
+        release = builder.get_object("release_label")
+        release.set_label("Galicaster "+__version__)
+
         self.gui=builder
 
         # BUILD GUI
@@ -102,11 +103,11 @@ class PlayerClassUI(ManagerUI):
         self.thread_id=None
         builder.connect_signals(self)
 
-        self.dispatcher.connect("player-vumeter", self.set_vumeter)
+        self.dispatcher.connect_ui("player-vumeter", self.set_vumeter)
         self.dispatcher.connect("play-stopped", self.change_state_bypass, GC_READY)
-        self.dispatcher.connect('play-list', self.play_from_list)
-        self.dispatcher.connect("view-changed", self.event_change_mode)
-        self.dispatcher.connect("quit", self.close)
+        self.dispatcher.connect_ui('play-list', self.play_from_list)
+        self.dispatcher.connect_ui("view-changed", self.event_change_mode)
+        self.dispatcher.connect_ui("quit", self.close)
 
 
 #-------------------------- INIT PLAYER-----------------------
@@ -154,7 +155,7 @@ class PlayerClassUI(ManagerUI):
 
 #------------------------- PLAYER ACTIONS ------------------------
 
-    def on_play_clicked(self, button):
+    def on_play_clicked(self, button=None):
         """Starts the reproduction"""
         self.change_state(GC_PLAY)
         self.player.play()
@@ -170,8 +171,11 @@ class PlayerClassUI(ManagerUI):
         
     def on_pause_clicked(self, button=None):
         """Pauses the reproduction"""
-        self.player.pause()
-        self.change_state(GC_PAUSE)
+        if not button or button.get_active():
+            self.player.pause()
+            self.change_state(GC_PAUSE)
+        else:
+            self.on_play_clicked()
         return True
 
     def on_stop_clicked(self, button=None):
@@ -238,7 +242,9 @@ class PlayerClassUI(ManagerUI):
     def create_drawing_areas(self, source): # TODO refactorize, REC
         """Creates the preview areas depending on the video tracks of a mediapackage"""
         main = self.main_area
-
+        for child in main.get_children():
+            main.remove(child)
+            child.destroy()
         areas = dict()
         for key in source.keys():
             new_area = Gtk.DrawingArea()
@@ -320,8 +326,6 @@ class PlayerClassUI(ManagerUI):
 
     def resize(self):
         """Adapts GUI elements to the screen size"""
-        size = context.get_mainwindow().get_size()
-        
         buttonlist = ["playbutton", "pausebutton", "stopbutton"]
         secondarylist = ["editbutton", "ingestbutton", "deletebutton"]
         self.do_resize(buttonlist, secondarylist)
@@ -330,7 +334,6 @@ class PlayerClassUI(ManagerUI):
         k = self.proportion
         calign.set_padding(int(k*20),int(k*10),0,0)
   
-        #self.statusbar.resize(size)
         return True
 
     def event_change_mode(self, orig, old_state, new_state):
@@ -370,11 +373,12 @@ class PlayerClassUI(ManagerUI):
         if state==GC_PLAY:
             play.set_sensitive(False)
             pause.set_sensitive(True)
+            pause.set_active(False)
             stop.set_sensitive(True)
 
         if state==GC_PAUSE:
             play.set_sensitive(True)
-            pause.set_sensitive(False)
+            pause.set_sensitive(True)
             stop.set_sensitive(True)
             
         if state==GC_STOP:
