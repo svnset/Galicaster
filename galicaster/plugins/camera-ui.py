@@ -42,6 +42,7 @@ def post_init(source=None):
 def open_config(button):
     win = Gtk.Window.new(Gtk.WindowType.TOPLEVEL)
     win.set_border_width(50)
+    win.set_position(Gtk.WindowPosition.MOUSE)
     hbox = Gtk.Box(spacing=10)
     win.add(hbox)
 
