@@ -7,6 +7,7 @@ gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
 from galicaster.core import context
+from galicaster.classui import get_ui_path
 import galicaster.utils.pysca as pysca
 
 #DEFAULTS
@@ -40,39 +41,52 @@ def post_init(source=None):
 
 
 def open_config(button):
-    win = Gtk.Window.new(Gtk.WindowType.TOPLEVEL)
-    win.set_border_width(50)
-    win.set_position(Gtk.WindowPosition.MOUSE)
-    hbox = Gtk.Box(spacing=10)
-    win.add(hbox)
+    global win
+
+    builder = Gtk.Builder()
+    builder.add_from_file(get_ui_path("camera-ui.glade"))
+
+    win = builder.get_object("window")
 
     #testing buttons
-    button = Gtk.Button.new_with_label("left")
+    button = builder.get_object("left")
     button.connect("clicked", move_left)
-    hbox.pack_start(button, True, True, 0)
 
-    button = Gtk.Button.new_with_label("right")
+    button = builder.get_object("leftup")
+    button.connect("clicked", move_leftup)
+
+    button = builder.get_object("leftdown")
+    button.connect("clicked", move_leftdown)
+
+    button = builder.get_object("right")
     button.connect("clicked", move_right)
-    hbox.pack_start(button, True, True, 0)
 
-    button = Gtk.Button.new_with_label("up")
+    button = builder.get_object("rightup")
+    button.connect("clicked", move_rightup)
+
+    button = builder.get_object("rightdown")
+    button.connect("clicked", move_rightdown)
+
+
+    button = builder.get_object("up")
     button.connect("clicked", move_up)
-    hbox.pack_start(button, True, True, 0)
 
-    button = Gtk.Button.new_with_label("down")
+
+    button = builder.get_object("down")
     button.connect("clicked", move_down)
-    hbox.pack_start(button, True, True, 0)
 
-    button = Gtk.Button.new_with_label("stop")
+
+    button = builder.get_object("stop")
     button.connect("clicked", stop_move)
-    hbox.pack_start(button, True, True, 0)
 
-    button = Gtk.Button.new_with_label("home")
+
+    button = builder.get_object("home")
     button.connect("clicked", move_home)
-    hbox.pack_start(button, True, True, 0)
+
 
     win.connect("delete-event", win.close)
     win.show_all()
+
 
 
 #testing camera functions
@@ -80,8 +94,24 @@ def move_left(button):
     pysca.pan_tilt(DEFAULT_DEVICE, pan=-7)
     print ("I move left")
 
+def move_leftup(button):
+    pysca.pan_tilt(DEFAULT_DEVICE, pan=-7, tilt=7)
+    print ("I move left")
+
+def move_leftdown(button):
+    pysca.pan_tilt(DEFAULT_DEVICE, pan=-7, tilt=-7)
+    print ("I move left")
+
 def move_right(button):
     pysca.pan_tilt(DEFAULT_DEVICE, pan=7)
+    print ("I move right")
+
+def move_rightup(button):
+    pysca.pan_tilt(DEFAULT_DEVICE, pan=7, tilt=7)
+    print ("I move right")
+
+def move_rightdown(button):
+    pysca.pan_tilt(DEFAULT_DEVICE, pan=7, tilt=-7)
     print ("I move right")
 
 def move_up(button):
