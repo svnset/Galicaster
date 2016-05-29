@@ -83,6 +83,10 @@ def open_config(button):
     button = builder.get_object("home")
     button.connect("clicked", move_home)
 
+    #testing scales
+    adj = builder.get_object("adjustment1")
+    adj.connect("value-changed", set_bright)
+
 
     win.connect("delete-event", win.close)
     win.show_all()
@@ -129,3 +133,14 @@ def stop_move(button):
 def move_home(button):
     pysca.pan_tilt_home(DEFAULT_DEVICE)
     print ("I move home")
+
+def set_bright(adj):
+    old_value = adj.get_value()
+    pysca.set_exp_comp(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
+
+    if adj.get_value() > old_value :
+        pysca.set_brightness(DEFAULT_DEVICE, pysca.BRIGHT_ACTION_UP)
+        print ("It gets lighter")
+    elif adj.get_value < old_value :
+        pysca.set_brightness(DEFAULT_DEVICE, pysca.BRIGHT_ACTION_DOWN)
+        print ("It gets darker")
