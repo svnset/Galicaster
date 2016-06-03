@@ -167,15 +167,17 @@ def set_bright(scale):
 
     #print (old_value)
     #print("here")
-    #pysca.set_exp_comp(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
+
 
     if new_value > old_value :
         print ("It gets lighter")
         #old_value = new_value
+        pysca.set_exp_comp(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
         pysca.set_brightness(DEFAULT_DEVICE, pysca.BRIGHT_ACTION_UP)
 
     elif new_value < old_value :
         print ("It gets darker")
+        pysca.set_exp_comp(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
         pysca.set_brightness(DEFAULT_DEVICE, pysca.BRIGHT_ACTION_DOWN)
 
 #def get_old_value(scale):
