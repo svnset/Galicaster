@@ -39,6 +39,18 @@ def post_init(source=None):
     new_button.show_all()
     buttonbox.add(new_button)
 
+    notebook = recorder_ui.get_object("data_panel")
+    #panel = Gtk.Box.new(Gtk.Orientation.HORIZONTAL)
+    #panel.show_all()
+    tab = Gtk.Label.new()
+    
+    #panel.add(new_tab)
+    #panel.show_all()
+    #tab.add(new_panel)
+    tab.show_all()
+    notebook.add(tab)
+
+
 #camera-ui settings window
 def open_config(button):
     global win
@@ -85,6 +97,24 @@ def open_config(button):
 
     button = builder.get_object("zoomout")
     button.connect("clicked", zoom_out)
+
+    button = builder.get_object("1")
+    button.connect("clicked", preset1)
+
+    button = builder.get_object("2")
+    button.connect("clicked", preset2)
+
+    button = builder.get_object("3")
+    button.connect("clicked", preset3)
+
+    button = builder.get_object("4")
+    button.connect("clicked", preset4)
+
+    button = builder.get_object("5")
+    button.connect("clicked", preset5)
+
+    button = builder.get_object("6")
+    button.connect("clicked", preset6)
 
     #testing scales
     scale = builder.get_object("scale1")
@@ -150,13 +180,37 @@ def move_home(button):
 #zoom
 def zoom_in(button):
     print ("zoom in")
-    pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_STOP)
-    pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_TELE, speed=3)
+    #pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_STOP)
+    pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_TELE, speed=5)
 
 def zoom_out(button):
     print ("zoom out")
+    #pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_STOP)
+    pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_WIDE, speed=5)
+
+def stop_zoom(button):
+    print ("stop zoom")
     pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_STOP)
-    pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_WIDE, speed=3)
+
+#presets
+
+def preset1(button):
+    pysca.recall_memory(DEFAULT_DEVICE, 0)
+
+def preset2(button):
+    pysca.recall_memory(DEFAULT_DEVICE, 1)
+
+def preset3(button):
+    pysca.recall_memory(DEFAULT_DEVICE, 2)
+
+def preset4(button):
+    pysca.recall_memory(DEFAULT_DEVICE, 3)
+
+def preset5(button):
+    pysca.recall_memory(DEFAULT_DEVICE, 4)
+
+def preset6(button):
+    pysca.recall_memory(DEFAULT_DEVICE, 5)
 
 #scale
 def set_bright(scale):
@@ -169,16 +223,16 @@ def set_bright(scale):
     #print("here")
 
 
-    if new_value > old_value :
-        print ("It gets lighter")
+    #if new_value > old_value:
+        #print ("It gets lighter")
         #old_value = new_value
-        pysca.set_exp_comp(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
-        pysca.set_brightness(DEFAULT_DEVICE, pysca.BRIGHT_ACTION_UP)
+    pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
+    pysca.set_brightness(DEFAULT_DEVICE, pysca.BRIGHT_ACTION_UP)
 
-    elif new_value < old_value :
-        print ("It gets darker")
-        pysca.set_exp_comp(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
-        pysca.set_brightness(DEFAULT_DEVICE, pysca.BRIGHT_ACTION_DOWN)
+    #elif new_value < old_value :
+        #print ("It gets darker")
+    #pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
+    #pysca.set_brightness(DEFAULT_DEVICE, pysca.BRIGHT_ACTION_DOWN)
 
 #def get_old_value(scale):
 #   old_value = float(scale.get_value())
