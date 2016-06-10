@@ -1306,12 +1306,26 @@ def set_brightness(device, action):
         The action performed depends on the value of the second parameter:
            * If up, increase brightness
            * If down, decrease brightness
+           * If an number, set the brightness to that value. Please check the camera manual to see the specific
+             brightness range and values available
         """
         try:
                 if action == BRIGHT_ACTION_UP:
                         __cmd_cam(device, VISCA_BRIGHT, VISCA_BRIGHT_UP)
                 elif action == BRIGHT_ACTION_DOWN:
                         __cmd_cam(device, VISCA_BRIGHT, VISCA_BRIGHT_DOWN)
+                else:
+                        try:
+                                action = int(action)
+                                if action < 0:
+                                        action = 0
+                                if action > 0x1F:
+                                        action = 0x1F
+
+                                __cmd_cam(device, VISCA_BRIGHT_VALUE, Packet.int_to_bytes(action, 4))
+                        except ValueError as e:
+                                raise ValueError("Expected integer, got {0}".format(action))
+
 
         except ValueError as e:
                         e.message = "The string {0} or {1} must be passed " \

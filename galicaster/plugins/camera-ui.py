@@ -26,7 +26,7 @@ def init():
 
 
 def post_init(source=None):
-    global recorder_ui, edit_button, old_value
+    global recorder_ui, edit_button
 
 
     conf = context.get_conf().get_section(CONFIG_SECTION) or {}
@@ -37,7 +37,7 @@ def post_init(source=None):
     new_button = Gtk.Button.new()
     new_button.set_image(image)
     new_button.connect('clicked', open_config)
-    #new_button.show_all()
+    new_button.show_all()
     buttonbox.add(new_button)
 
     old_value = 0
