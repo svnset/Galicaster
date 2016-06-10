@@ -281,35 +281,38 @@ def preset6(button):
 #scale
 def set_bright(scale, old_value):
 
-    new_value = scale.get_value()
-    diff = old_value - new_value
+    pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
+    pysca.set_brightness(DEFAULT_DEVICE, scale.get_value())
+
+    #new_value = scale.get_value()
+    #diff = old_value - new_value
 
     #stash = new_value
     #stash2 = old_value
 
 
 
-    if new_value > old_value:
-        print ("It gets lighter")
-        old_value = get_old_value(scale)-1
-        if diff > (old_value-new_value):
-            old_value = get_old_value(scale)+1
-        print (old_value)
-        pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
-        pysca.set_brightness(DEFAULT_DEVICE, pysca.BRIGHT_ACTION_UP)
+    #if new_value > old_value:
+    #    print ("It gets lighter")
+    #    old_value = get_old_value(scale)-1
+    #    if diff > (old_value-new_value):
+    #        old_value = get_old_value(scale)+1
+    #    print (old_value)
+    #    pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
+    #    pysca.set_brightness(DEFAULT_DEVICE, pysca.BRIGHT_ACTION_UP)
 
-    elif new_value < old_value:
-        print ("It gets darker")
-        old_value = get_old_value(scale)+1
-        if diff < (old_value-new_value):
-            old_value = get_old_value(scale)-1
-        print(old_value)
+    #elif new_value < old_value:
+    #    print ("It gets darker")
+    #    old_value = get_old_value(scale)+1
+    #    if diff < (old_value-new_value):
+    #        old_value = get_old_value(scale)-1
+    #    print(old_value)
 
 
-        pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
-        pysca.set_brightness(DEFAULT_DEVICE, pysca.BRIGHT_ACTION_DOWN)
+    #    pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
+    #     pysca.set_brightness(DEFAULT_DEVICE, pysca.BRIGHT_ACTION_DOWN)
 
-def get_old_value(scale):
+#def get_old_value(scale):
 
-    old_value = scale.get_value()
-    return old_value
+   #old_value = scale.get_value()
+    #return old_value
