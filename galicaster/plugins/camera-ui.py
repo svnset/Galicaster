@@ -26,7 +26,8 @@ def init():
 
 
 def post_init(source=None):
-    global recorder_ui, edit_button
+    global recorder_ui, edit_button, old_value
+
 
     conf = context.get_conf().get_section(CONFIG_SECTION) or {}
 
@@ -36,19 +37,84 @@ def post_init(source=None):
     new_button = Gtk.Button.new()
     new_button.set_image(image)
     new_button.connect('clicked', open_config)
-    new_button.show_all()
+    #new_button.show_all()
     buttonbox.add(new_button)
 
+    old_value = 0
     notebook = recorder_ui.get_object("data_panel")
-    #panel = Gtk.Box.new(Gtk.Orientation.HORIZONTAL)
-    #panel.show_all()
-    tab = Gtk.Label.new()
-    
-    #panel.add(new_tab)
-    #panel.show_all()
-    #tab.add(new_panel)
-    tab.show_all()
-    notebook.add(tab)
+
+    label = Gtk.Label.new("Settings")
+
+    builder = Gtk.Builder()
+    builder.add_from_file(get_ui_path("camera-ui3.glade"))
+
+    tabbox = builder.get_object("box")
+
+    #testing buttons
+    button = builder.get_object("left")
+    button.connect("clicked", move_left)
+
+    button = builder.get_object("leftup")
+    button.connect("clicked", move_leftup)
+
+    button = builder.get_object("leftdown")
+    button.connect("clicked", move_leftdown)
+
+    button = builder.get_object("right")
+    button.connect("clicked", move_right)
+
+    button = builder.get_object("rightup")
+    button.connect("clicked", move_rightup)
+
+    button = builder.get_object("rightdown")
+    button.connect("clicked", move_rightdown)
+
+    button = builder.get_object("up")
+    button.connect("clicked", move_up)
+
+    button = builder.get_object("down")
+    button.connect("clicked", move_down)
+
+    button = builder.get_object("stop")
+    button.connect("clicked", stop_move)
+
+    button = builder.get_object("home")
+    button.connect("clicked", move_home)
+
+    button = builder.get_object("zoomin")
+    button.connect("clicked", zoom_in)
+
+    button = builder.get_object("zoomout")
+    button.connect("clicked", zoom_out)
+
+    button = builder.get_object("stopzoom")
+    button.connect("clicked", stop_zoom)
+
+    button = builder.get_object("1")
+    button.connect("clicked", preset1)
+
+    button = builder.get_object("2")
+    button.connect("clicked", preset2)
+
+    button = builder.get_object("3")
+    button.connect("clicked", preset3)
+
+    button = builder.get_object("4")
+    button.connect("clicked", preset4)
+
+    button = builder.get_object("5")
+    button.connect("clicked", preset5)
+
+    button = builder.get_object("6")
+    button.connect("clicked", preset6)
+
+    #testing scales
+
+    scale = builder.get_object("scale1")
+    scale.connect("value-changed", set_bright, old_value)
+
+    tabbox.show_all()
+    notebook.append_page(tabbox, label)
 
 
 #camera-ui settings window
@@ -213,26 +279,37 @@ def preset6(button):
     pysca.recall_memory(DEFAULT_DEVICE, 5)
 
 #scale
-def set_bright(scale):
-    old_value = 0
+def set_bright(scale, old_value):
+
     new_value = scale.get_value()
+    diff = old_value - new_value
+
     #stash = new_value
     #stash2 = old_value
 
-    #print (old_value)
-    #print("here")
 
 
-    #if new_value > old_value:
-        #print ("It gets lighter")
-        #old_value = new_value
-    pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
-    pysca.set_brightness(DEFAULT_DEVICE, pysca.BRIGHT_ACTION_UP)
+    if new_value > old_value:
+        print ("It gets lighter")
+        old_value = get_old_value(scale)-1
+        if diff > (old_value-new_value):
+            old_value = get_old_value(scale)+1
+        print (old_value)
+        pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
+        pysca.set_brightness(DEFAULT_DEVICE, pysca.BRIGHT_ACTION_UP)
 
-    #elif new_value < old_value :
-        #print ("It gets darker")
-    #pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
-    #pysca.set_brightness(DEFAULT_DEVICE, pysca.BRIGHT_ACTION_DOWN)
+    elif new_value < old_value:
+        print ("It gets darker")
+        old_value = get_old_value(scale)+1
+        if diff < (old_value-new_value):
+            old_value = get_old_value(scale)-1
+        print(old_value)
 
-#def get_old_value(scale):
-#   old_value = float(scale.get_value())
+
+        pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
+        pysca.set_brightness(DEFAULT_DEVICE, pysca.BRIGHT_ACTION_DOWN)
+
+def get_old_value(scale):
+
+    old_value = scale.get_value()
+    return old_value
