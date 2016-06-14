@@ -1,5 +1,5 @@
 *.py[co]
-conf.ini
+*.ini
 
 # Packages
 *.egg
