@@ -46,28 +46,36 @@ def post_init(source=None):
 
     #buttons
     button = builder.get_object("left")
-    button.connect("clicked", move_left)
+    button.connect("pressed", move_left)
+    button.connect("released", stop_move)
 
     button = builder.get_object("leftup")
-    button.connect("clicked", move_leftup)
+    button.connect("pressed", move_leftup)
+    button.connect("released", stop_move)
 
     button = builder.get_object("leftdown")
-    button.connect("clicked", move_leftdown)
+    button.connect("pressed", move_leftdown)
+    button.connect("released", stop_move)
 
     button = builder.get_object("right")
-    button.connect("clicked", move_right)
+    button.connect("pressed", move_right)
+    button.connect("released", stop_move)
 
     button = builder.get_object("rightup")
-    button.connect("clicked", move_rightup)
+    button.connect("pressed", move_rightup)
+    button.connect("released", stop_move)
 
     button = builder.get_object("rightdown")
-    button.connect("clicked", move_rightdown)
+    button.connect("pressed", move_rightdown)
+    button.connect("released", stop_move)
 
     button = builder.get_object("up")
-    button.connect("clicked", move_up)
+    button.connect("pressed", move_up)
+    button.connect("released", stop_move)
 
     button = builder.get_object("down")
-    button.connect("clicked", move_down)
+    button.connect("pressed", move_down)
+    button.connect("released", stop_move)
 
     button = builder.get_object("stop")
     button.connect("clicked", stop_move)
@@ -114,7 +122,7 @@ def post_init(source=None):
 #move
 def move_left(button):
     print ("I move left")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=-7)
+    pysca.pan_tilt(DEFAULT_DEVICE, pan=-8)
 
 
 def move_leftup(button):
@@ -129,7 +137,7 @@ def move_leftdown(button):
 
 def move_right(button):
     print ("I move right")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=7)
+    pysca.pan_tilt(DEFAULT_DEVICE, pan=8)
 
 
 def move_rightup(button):
@@ -144,12 +152,12 @@ def move_rightdown(button):
 
 def move_up(button):
     print ("I move up")
-    pysca.pan_tilt(DEFAULT_DEVICE, tilt=7)
+    pysca.pan_tilt(DEFAULT_DEVICE, tilt=8)
 
 
 def move_down(button):
     print ("I move down")
-    pysca.pan_tilt(DEFAULT_DEVICE, tilt=-7)
+    pysca.pan_tilt(DEFAULT_DEVICE, tilt=-8)
 
 
 def stop_move(button):
@@ -197,4 +205,4 @@ def preset6(button):
 #brightness scale
 def set_bright(scale):
     pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
-    pysca.set_brightness(DEFAULT_DEVICE, scale.get_value())
+    pysca.set_brightness(DEFAULT_DEVICE, scale.get_value()+15)
