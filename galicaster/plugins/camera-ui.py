@@ -76,10 +76,10 @@ def post_init(source=None):
     button.connect("clicked", move_home)
 
     button = builder.get_object("zoomin")
-    button.connect("toggled", zoom_in)
+    button.connect("pressed", zoom_in)
 
     button = builder.get_object("zoomout")
-    button.connect("toggled", zoom_out)
+    button.connect("pressed", zoom_out)
 
     button = builder.get_object("stopzoom")
     button.connect("clicked", stop_zoom)
@@ -165,17 +165,17 @@ def move_home(button):
 #zoom buttons
 def zoom_in(button):
     print ("zoom in")
-    if button.get_active == True:
-        pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_TELE, speed=5)
-    else:
-        pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_STOP)
+    #if button.get_active == False:
+    pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_TELE, speed=5)
+    #else:
+        #pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_STOP)
 
 def zoom_out(button):
     print ("zoom out")
-    if button.get_active == True:
-        pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_WIDE, speed=5)
-    else:
-        pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_STOP)
+    #if button.get_active == False:
+    pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_WIDE, speed=5)
+    #else:
+        #pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_STOP)
 
 def stop_zoom(button):
     print ("stop zoom")
