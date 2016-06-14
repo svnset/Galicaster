@@ -36,7 +36,7 @@ def post_init(source=None):
 
     #implement glade file
     builder = Gtk.Builder()
-    builder.add_from_file(get_ui_path("camera-ui3.glade"))
+    builder.add_from_file(get_ui_path("camera-ui.glade"))
 
     #add new settings tab to the notebook
     label = Gtk.Label.new("Settings")
@@ -76,10 +76,10 @@ def post_init(source=None):
     button.connect("clicked", move_home)
 
     button = builder.get_object("zoomin")
-    button.connect("clicked", zoom_in)
+    button.connect("toggled", zoom_in)
 
     button = builder.get_object("zoomout")
-    button.connect("clicked", zoom_out)
+    button.connect("toggled", zoom_out)
 
     button = builder.get_object("stopzoom")
     button.connect("clicked", stop_zoom)
@@ -162,22 +162,26 @@ def move_home(button):
     print ("I move home")
     pysca.pan_tilt_home(DEFAULT_DEVICE)
 
-#zoom
+#zoom buttons
 def zoom_in(button):
     print ("zoom in")
-    #pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_STOP)
-    pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_TELE, speed=5)
+    if button.get_active == True:
+        pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_TELE, speed=5)
+    else:
+        pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_STOP)
 
 def zoom_out(button):
     print ("zoom out")
-    #pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_STOP)
-    pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_WIDE, speed=5)
+    if button.get_active == True:
+        pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_WIDE, speed=5)
+    else:
+        pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_STOP)
 
 def stop_zoom(button):
     print ("stop zoom")
     pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_STOP)
 
-#presets
+#preset buttons
 
 def preset1(button):
     pysca.recall_memory(DEFAULT_DEVICE, 0)
@@ -197,41 +201,8 @@ def preset5(button):
 def preset6(button):
     pysca.recall_memory(DEFAULT_DEVICE, 5)
 
-#scale
-def set_bright(scale, old_value):
+#brightness scale
+def set_bright(scale):
 
     pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
     pysca.set_brightness(DEFAULT_DEVICE, scale.get_value())
-
-    #new_value = scale.get_value()
-    #diff = old_value - new_value
-
-    #stash = new_value
-    #stash2 = old_value
-
-
-
-    #if new_value > old_value:
-    #    print ("It gets lighter")
-    #    old_value = get_old_value(scale)-1
-    #    if diff > (old_value-new_value):
-    #        old_value = get_old_value(scale)+1
-    #    print (old_value)
-    #    pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
-    #    pysca.set_brightness(DEFAULT_DEVICE, pysca.BRIGHT_ACTION_UP)
-
-    #elif new_value < old_value:
-    #    print ("It gets darker")
-    #    old_value = get_old_value(scale)+1
-    #    if diff < (old_value-new_value):
-    #        old_value = get_old_value(scale)-1
-    #    print(old_value)
-
-
-    #    pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
-    #     pysca.set_brightness(DEFAULT_DEVICE, pysca.BRIGHT_ACTION_DOWN)
-
-#def get_old_value(scale):
-
-   #old_value = scale.get_value()
-    #return old_value
