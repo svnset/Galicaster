@@ -1,5 +1,5 @@
 *.py[co]
-*.ini
+
 
 # Packages
 *.egg
@@ -36,3 +36,5 @@ tests/resources/profile/folder/
 
 # log dir
 log/
+
+/conf.ini
