@@ -77,12 +77,11 @@ def post_init(source=None):
 
     button = builder.get_object("zoomin")
     button.connect("pressed", zoom_in)
+    button.connect("released", stop_zoom)
 
     button = builder.get_object("zoomout")
     button.connect("pressed", zoom_out)
-
-    button = builder.get_object("stopzoom")
-    button.connect("clicked", stop_zoom)
+    button.connect("released", stop_zoom)
 
     button = builder.get_object("1")
     button.connect("clicked", preset1)
@@ -165,17 +164,11 @@ def move_home(button):
 #zoom buttons
 def zoom_in(button):
     print ("zoom in")
-    #if button.get_active == False:
     pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_TELE, speed=5)
-    #else:
-        #pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_STOP)
 
 def zoom_out(button):
     print ("zoom out")
-    #if button.get_active == False:
     pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_WIDE, speed=5)
-    #else:
-        #pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_STOP)
 
 def stop_zoom(button):
     print ("stop zoom")
@@ -203,6 +196,5 @@ def preset6(button):
 
 #brightness scale
 def set_bright(scale):
-
     pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
     pysca.set_brightness(DEFAULT_DEVICE, scale.get_value())
