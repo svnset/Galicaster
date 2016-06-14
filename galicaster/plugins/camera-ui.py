@@ -26,31 +26,25 @@ def init():
 
 
 def post_init(source=None):
-    global recorder_ui, edit_button
+    global recorder_ui
 
 
     conf = context.get_conf().get_section(CONFIG_SECTION) or {}
-
     recorder_ui = context.get_mainwindow().nbox.get_nth_page(0).gui
-    buttonbox = recorder_ui.get_object("buttonbox")
-    image = recorder_ui.get_object("moreimage")
-    new_button = Gtk.Button.new()
-    new_button.set_image(image)
-    new_button.connect('clicked', open_config)
-    new_button.show_all()
-    buttonbox.add(new_button)
-
-    old_value = 0
     notebook = recorder_ui.get_object("data_panel")
 
-    label = Gtk.Label.new("Settings")
 
+    #implement glade file
     builder = Gtk.Builder()
     builder.add_from_file(get_ui_path("camera-ui3.glade"))
 
+    #add new settings tab to the notebook
+    label = Gtk.Label.new("Settings")
     tabbox = builder.get_object("box")
+    tabbox.show_all()
+    notebook.append_page(tabbox, label)
 
-    #testing buttons
+    #buttons
     button = builder.get_object("left")
     button.connect("clicked", move_left)
 
@@ -108,90 +102,15 @@ def post_init(source=None):
     button = builder.get_object("6")
     button.connect("clicked", preset6)
 
-    #testing scales
+    #scales
 
-    scale = builder.get_object("scale1")
-    scale.connect("value-changed", set_bright, old_value)
-
-    tabbox.show_all()
-    notebook.append_page(tabbox, label)
-
-
-#camera-ui settings window
-def open_config(button):
-    global win
-
-    builder = Gtk.Builder()
-    builder.add_from_file(get_ui_path("camera-ui.glade"))
-
-
-    win = builder.get_object("window")
-
-    #testing buttons
-    button = builder.get_object("left")
-    button.connect("clicked", move_left)
-
-    button = builder.get_object("leftup")
-    button.connect("clicked", move_leftup)
-
-    button = builder.get_object("leftdown")
-    button.connect("clicked", move_leftdown)
-
-    button = builder.get_object("right")
-    button.connect("clicked", move_right)
-
-    button = builder.get_object("rightup")
-    button.connect("clicked", move_rightup)
-
-    button = builder.get_object("rightdown")
-    button.connect("clicked", move_rightdown)
-
-    button = builder.get_object("up")
-    button.connect("clicked", move_up)
-
-    button = builder.get_object("down")
-    button.connect("clicked", move_down)
-
-    button = builder.get_object("stop")
-    button.connect("clicked", stop_move)
-
-    button = builder.get_object("home")
-    button.connect("clicked", move_home)
-
-    button = builder.get_object("zoomin")
-    button.connect("clicked", zoom_in)
-
-    button = builder.get_object("zoomout")
-    button.connect("clicked", zoom_out)
-
-    button = builder.get_object("1")
-    button.connect("clicked", preset1)
-
-    button = builder.get_object("2")
-    button.connect("clicked", preset2)
-
-    button = builder.get_object("3")
-    button.connect("clicked", preset3)
-
-    button = builder.get_object("4")
-    button.connect("clicked", preset4)
-
-    button = builder.get_object("5")
-    button.connect("clicked", preset5)
-
-    button = builder.get_object("6")
-    button.connect("clicked", preset6)
-
-    #testing scales
     scale = builder.get_object("scale1")
     scale.connect("value-changed", set_bright)
 
-    win.connect("delete-event", win.close)
-    win.show_all()
 
 
 
-#testing camera functions
+#camera functions
 
 #move
 def move_left(button):
