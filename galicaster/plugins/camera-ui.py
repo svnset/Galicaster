@@ -26,7 +26,7 @@ def init():
 
 
 def post_init(source=None):
-    global recorder_ui
+    global recorder_ui, scale
 
 
     conf = context.get_conf().get_section(CONFIG_SECTION) or {}
@@ -45,6 +45,7 @@ def post_init(source=None):
     notebook.append_page(tabbox, label)
 
     #buttons
+    #movement
     button = builder.get_object("left")
     button.connect("pressed", move_left)
     button.connect("released", stop_move)
@@ -77,12 +78,10 @@ def post_init(source=None):
     button.connect("pressed", move_down)
     button.connect("released", stop_move)
 
-    button = builder.get_object("stop")
-    button.connect("clicked", stop_move)
-
     button = builder.get_object("home")
     button.connect("clicked", move_home)
 
+    #zoom
     button = builder.get_object("zoomin")
     button.connect("pressed", zoom_in)
     button.connect("released", stop_zoom)
@@ -91,6 +90,7 @@ def post_init(source=None):
     button.connect("pressed", zoom_out)
     button.connect("released", stop_zoom)
 
+    #presets
     button = builder.get_object("1")
     button.connect("clicked", preset1)
 
@@ -109,10 +109,20 @@ def post_init(source=None):
     button = builder.get_object("6")
     button.connect("clicked", preset6)
 
-    #scales
+    #to set a new preset
+    button = builder.get_object("preset")
+    button.connect("clicked", set_preset)
 
+
+    #reset all settings
+    button = builder.get_object("reset")
+    button.connect("clicked", reset)
+
+    #scales
     scale = builder.get_object("scale1")
     scale.connect("value-changed", set_bright)
+
+
 
 
 
@@ -206,3 +216,18 @@ def preset6(button):
 def set_bright(scale):
     pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
     pysca.set_brightness(DEFAULT_DEVICE, scale.get_value()+15)
+
+#reset all settings
+def reset(button):
+    #reset brightness
+    pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
+    pysca.set_brightness(DEFAULT_DEVICE, 15)
+    scale.set_value(0)
+    #reset zoom
+    pysca.set_zoom(DEFAULT_DEVICE, 0000)
+    #reset location
+    pysca.pan_tilt_home(DEFAULT_DEVICE)
+
+def set_preset(button):
+    return None
+
