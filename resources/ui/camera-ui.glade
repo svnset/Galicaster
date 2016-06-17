@@ -92,6 +92,8 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="hexpand">False</property>
+                <property name="vexpand">False</property>
                 <property name="image">image7</property>
               </object>
               <packing>
@@ -104,6 +106,8 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="hexpand">False</property>
+                <property name="vexpand">False</property>
                 <property name="image">image8</property>
               </object>
               <packing>
@@ -116,6 +120,8 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="hexpand">False</property>
+                <property name="vexpand">False</property>
                 <property name="image">image10</property>
               </object>
               <packing>
