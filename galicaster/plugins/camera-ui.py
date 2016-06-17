@@ -5,7 +5,7 @@ import gi
 
 gi.require_version("Gtk", "3.0")
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 from galicaster.core import context
 from galicaster.classui import get_ui_path
 import galicaster.utils.pysca as pysca
@@ -26,7 +26,7 @@ def init():
 
 
 def post_init(source=None):
-    global recorder_ui, scale
+    global recorder_ui, scale, presetbutton
 
 
     conf = context.get_conf().get_section(CONFIG_SECTION) or {}
@@ -110,8 +110,7 @@ def post_init(source=None):
     button.connect("clicked", preset6)
 
     #to set a new preset
-    button = builder.get_object("preset")
-    button.connect("clicked", set_preset)
+    presetbutton = builder.get_object("preset")
 
 
     #reset all settings
@@ -195,22 +194,46 @@ def stop_zoom(button):
 #preset buttons
 
 def preset1(button):
-    pysca.recall_memory(DEFAULT_DEVICE, 0)
+    if presetbutton.get_active():
+        pysca.set_memory(DEFAULT_DEVICE, 0)
+        presetbutton.set_active(False)
+    else:
+        pysca.recall_memory(DEFAULT_DEVICE, 0)
 
 def preset2(button):
-    pysca.recall_memory(DEFAULT_DEVICE, 1)
+    if presetbutton.get_active():
+        pysca.set_memory(DEFAULT_DEVICE, 1)
+        presetbutton.set_active(False)
+    else:
+        pysca.recall_memory(DEFAULT_DEVICE, 1)
 
 def preset3(button):
-    pysca.recall_memory(DEFAULT_DEVICE, 2)
+    if presetbutton.get_active():
+        pysca.set_memory(DEFAULT_DEVICE, 2)
+        presetbutton.set_active(False)
+    else:
+        pysca.recall_memory(DEFAULT_DEVICE, 2)
 
 def preset4(button):
-    pysca.recall_memory(DEFAULT_DEVICE, 3)
+    if presetbutton.get_active():
+        pysca.set_memory(DEFAULT_DEVICE, 3)
+        presetbutton.set_active(False)
+    else:
+        pysca.recall_memory(DEFAULT_DEVICE, 3)
 
 def preset5(button):
-    pysca.recall_memory(DEFAULT_DEVICE, 4)
+    if presetbutton.get_active():
+        pysca.set_memory(DEFAULT_DEVICE, 4)
+        presetbutton.set_active(False)
+    else:
+        pysca.recall_memory(DEFAULT_DEVICE, 4)
 
 def preset6(button):
-    pysca.recall_memory(DEFAULT_DEVICE, 5)
+    if presetbutton.get_active():
+        pysca.set_memory(DEFAULT_DEVICE, 5)
+        presetbutton.set_active(False)
+    else:
+        pysca.recall_memory(DEFAULT_DEVICE, 5)
 
 #brightness scale
 def set_bright(scale):
@@ -228,6 +251,5 @@ def reset(button):
     #reset location
     pysca.pan_tilt_home(DEFAULT_DEVICE)
 
-def set_preset(button):
-    return None
+
 
