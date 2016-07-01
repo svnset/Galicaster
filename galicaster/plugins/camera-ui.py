@@ -5,7 +5,7 @@ import gi
 
 gi.require_version("Gtk", "3.0")
 
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk, Gdk, GObject
 from galicaster.core import context
 from galicaster.classui import get_ui_path
 import galicaster.utils.pysca as pysca
@@ -114,7 +114,7 @@ def post_init(source=None):
 
     #fly-mode for camera-movement
     flybutton = builder.get_object("fly")
-    button.connect("clicked",fly_mode)
+    flybutton.connect("clicked", fly_mode)
 
 
     #reset all settings
@@ -127,12 +127,9 @@ def post_init(source=None):
 
 
 
-
-
-
 #camera functions
 
-#move
+#movement functions
 def move_left(button):
     print ("I move left")
     pysca.pan_tilt(DEFAULT_DEVICE, pan=-8)
@@ -182,7 +179,7 @@ def move_home(button):
     print ("I move home")
     pysca.pan_tilt_home(DEFAULT_DEVICE)
 
-#zoom buttons
+#zoom functions
 def zoom_in(button):
     print ("zoom in")
     pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_TELE, speed=5)
@@ -195,7 +192,7 @@ def stop_zoom(button):
     print ("stop zoom")
     pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_STOP)
 
-#preset buttons
+#preset functions
 
 def preset1(button):
     if presetbutton.get_active():
@@ -255,95 +252,101 @@ def reset(button):
     #reset location
     pysca.pan_tilt_home(DEFAULT_DEVICE)
 
-#flymode activation connects clicked signal and disconnects pressed/released to keep the movement
+
+#flymode activation connects clicked signal and disconnects
+# pressed/released to keep the movement
 def fly_mode(flybutton):
     #fly mode turned on
-    if flybutton.get_active:
+    if flybutton.get_active():
         print ("fly mode turned on")
         button = builder.get_object("left")
-        button.disconnect("pressed", move_left)
-        button.disconnect("released", stop_move)
+        GObject.signal_handlers_destroy(button)
         button.connect("clicked", move_left)
 
         button = builder.get_object("leftup")
-        button.disconnect("pressed", move_leftup)
-        button.disconnect("released", stop_move)
+        GObject.signal_handlers_destroy(button)
         button.connect("clicked", move_leftup)
 
         button = builder.get_object("leftdown")
-        button.disconnect("pressed", move_leftdown)
-        button.disconnect("released", stop_move)
+        GObject.signal_handlers_destroy(button)
         button.connect("clicked", move_leftdown)
 
         button = builder.get_object("right")
-        button.disconnect("pressed", move_right)
-        button.disconnect("released", stop_move)
+        GObject.signal_handlers_destroy(button)
         button.connect("clicked", move_right)
 
         button = builder.get_object("rightup")
-        button.disconnect("pressed", move_rightup)
-        button.disconnect("released", stop_move)
+        GObject.signal_handlers_destroy(button)
         button.connect("clicked", move_rightup)
 
         button = builder.get_object("rightdown")
-        button.disconnect("pressed", move_rightdown)
-        button.disconnect("released", stop_move)
+        GObject.signal_handlers_destroy(button)
         button.connect("clicked", move_rightdown)
 
         button = builder.get_object("up")
-        button.disconnect("pressed", move_up)
-        button.disconnect("released", stop_move)
+        GObject.signal_handlers_destroy(button)
         button.connect("clicked", move_up)
 
         button = builder.get_object("down")
-        button.disconnect("pressed", move_down)
-        button.disconnect("released", stop_move)
+        GObject.signal_handlers_destroy(button)
         button.connect("clicked", move_down)
+
+        button = builder.get_object("home")
+        GObject.signal_handlers_destroy(button)
+        button.set
+        button.connect("clicked", stop_move)
+
 
     #fly mode turned off
     else:
         print("fly mode turned off")
 
         button = builder.get_object("left")
-        button.disconnect("clicked", move_left)
+        GObject.signal_handlers_destroy(button)
         button.connect("pressed", move_left)
         button.connect("released", stop_move)
 
         button = builder.get_object("leftup")
-        button.disconnect("clicked", move_leftup)
+        GObject.signal_handlers_destroy(button)
         button.connect("pressed", move_leftup)
         button.connect("released", stop_move)
 
         button = builder.get_object("leftdown")
-        button.disconnect("clicked", move_leftdown)
+        GObject.signal_handlers_destroy(button)
         button.connect("pressed", move_leftdown)
         button.connect("released", stop_move)
 
         button = builder.get_object("right")
-        button.disconnect("clicked", move_right)
+        GObject.signal_handlers_destroy(button)
         button.connect("pressed", move_right)
         button.connect("released", stop_move)
 
         button = builder.get_object("rightup")
-        button.disconnect("clicked", move_rightup)
+        GObject.signal_handlers_destroy(button)
         button.connect("pressed", move_rightup)
         button.connect("released", stop_move)
 
         button = builder.get_object("rightdown")
-        button.disconnect("clicked", move_rightdown)
+        GObject.signal_handlers_destroy(button)
         button.connect("pressed", move_rightdown)
         button.connect("released", stop_move)
 
         button = builder.get_object("up")
-        button.disconnect("clicked", move_up)
+        GObject.signal_handlers_destroy(button)
         button.connect("pressed", move_up)
         button.connect("released", stop_move)
 
         button = builder.get_object("down")
-        button.disconnect("clicked", move_down)
+        GObject.signal_handlers_destroy(button)
         button.connect("pressed", move_down)
         button.connect("released", stop_move)
 
+        button = builder.get_object("home")
+        image = builder.get_object("stopimg")
+        GObject.signal_handlers_destroy(button)
+        button.set_image(image)
+        button.connect("clicked", move_home)
 
 
 
+y
