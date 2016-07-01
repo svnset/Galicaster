@@ -26,7 +26,7 @@ def init():
 
 
 def post_init(source=None):
-    global recorder_ui, scale, presetbutton
+    global recorder_ui, scale, presetbutton, flybutton, builder
 
 
     conf = context.get_conf().get_section(CONFIG_SECTION) or {}
@@ -111,6 +111,10 @@ def post_init(source=None):
 
     #to set a new preset
     presetbutton = builder.get_object("preset")
+
+    #fly-mode for camera-movement
+    flybutton = builder.get_object("fly")
+    button.connect("clicked",fly_mode)
 
 
     #reset all settings
@@ -250,6 +254,96 @@ def reset(button):
     pysca.set_zoom(DEFAULT_DEVICE, 0000)
     #reset location
     pysca.pan_tilt_home(DEFAULT_DEVICE)
+
+#flymode activation connects clicked signal and disconnects pressed/released to keep the movement
+def fly_mode(flybutton):
+    #fly mode turned on
+    if flybutton.get_active:
+        print ("fly mode turned on")
+        button = builder.get_object("left")
+        button.disconnect("pressed", move_left)
+        button.disconnect("released", stop_move)
+        button.connect("clicked", move_left)
+
+        button = builder.get_object("leftup")
+        button.disconnect("pressed", move_leftup)
+        button.disconnect("released", stop_move)
+        button.connect("clicked", move_leftup)
+
+        button = builder.get_object("leftdown")
+        button.disconnect("pressed", move_leftdown)
+        button.disconnect("released", stop_move)
+        button.connect("clicked", move_leftdown)
+
+        button = builder.get_object("right")
+        button.disconnect("pressed", move_right)
+        button.disconnect("released", stop_move)
+        button.connect("clicked", move_right)
+
+        button = builder.get_object("rightup")
+        button.disconnect("pressed", move_rightup)
+        button.disconnect("released", stop_move)
+        button.connect("clicked", move_rightup)
+
+        button = builder.get_object("rightdown")
+        button.disconnect("pressed", move_rightdown)
+        button.disconnect("released", stop_move)
+        button.connect("clicked", move_rightdown)
+
+        button = builder.get_object("up")
+        button.disconnect("pressed", move_up)
+        button.disconnect("released", stop_move)
+        button.connect("clicked", move_up)
+
+        button = builder.get_object("down")
+        button.disconnect("pressed", move_down)
+        button.disconnect("released", stop_move)
+        button.connect("clicked", move_down)
+
+    #fly mode turned off
+    else:
+        print("fly mode turned off")
+
+        button = builder.get_object("left")
+        button.disconnect("clicked", move_left)
+        button.connect("pressed", move_left)
+        button.connect("released", stop_move)
+
+        button = builder.get_object("leftup")
+        button.disconnect("clicked", move_leftup)
+        button.connect("pressed", move_leftup)
+        button.connect("released", stop_move)
+
+        button = builder.get_object("leftdown")
+        button.disconnect("clicked", move_leftdown)
+        button.connect("pressed", move_leftdown)
+        button.connect("released", stop_move)
+
+        button = builder.get_object("right")
+        button.disconnect("clicked", move_right)
+        button.connect("pressed", move_right)
+        button.connect("released", stop_move)
+
+        button = builder.get_object("rightup")
+        button.disconnect("clicked", move_rightup)
+        button.connect("pressed", move_rightup)
+        button.connect("released", stop_move)
+
+        button = builder.get_object("rightdown")
+        button.disconnect("clicked", move_rightdown)
+        button.connect("pressed", move_rightdown)
+        button.connect("released", stop_move)
+
+        button = builder.get_object("up")
+        button.disconnect("clicked", move_up)
+        button.connect("pressed", move_up)
+        button.connect("released", stop_move)
+
+        button = builder.get_object("down")
+        button.disconnect("clicked", move_down)
+        button.connect("pressed", move_down)
+        button.connect("released", stop_move)
+
 
 
 
