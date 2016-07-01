@@ -5,7 +5,7 @@ import gi
 
 gi.require_version("Gtk", "3.0")
 
-from gi.repository import Gtk, Gdk, GObject
+from gi.repository import Gtk, GObject
 from galicaster.core import context
 from galicaster.classui import get_ui_path
 import galicaster.utils.pysca as pysca
@@ -26,7 +26,7 @@ def init():
 
 
 def post_init(source=None):
-    global recorder_ui, scale, presetbutton, flybutton, builder
+    global recorder_ui, scale, presetbutton, flybutton, builder, onoffbutton
 
 
     conf = context.get_conf().get_section(CONFIG_SECTION) or {}
@@ -116,6 +116,9 @@ def post_init(source=None):
     flybutton = builder.get_object("fly")
     flybutton.connect("clicked", fly_mode)
 
+    #on-off button
+    onoffbutton = builder.get_object("on-off")
+    onoffbutton.connect("state-set", turn_on_off)
 
     #reset all settings
     button = builder.get_object("reset")
@@ -252,6 +255,12 @@ def reset(button):
     #reset location
     pysca.pan_tilt_home(DEFAULT_DEVICE)
 
+#turns the camera on/off
+def turn_on_off(onoffbutton, self):
+    if onoffbutton.get_active():
+        pysca.set_power_on(DEFAULT_DEVICE, True)
+    else:
+        pysca.set_power_on(DEFAULT_DEVICE, False)
 
 #flymode activation connects clicked signal and disconnects
 # pressed/released to keep the movement
