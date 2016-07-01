@@ -125,7 +125,7 @@ def post_init(source=None):
     button.connect("clicked", reset)
 
     #scales
-    scale = builder.get_object("scale1")
+    scale = builder.get_object("brightscale")
     scale.connect("value-changed", set_bright)
 
 
