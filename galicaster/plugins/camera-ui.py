@@ -292,8 +292,9 @@ def fly_mode(flybutton):
         button.connect("clicked", move_down)
 
         button = builder.get_object("home")
+        img = builder.get_object("stopimg")
         GObject.signal_handlers_destroy(button)
-        button.set
+        button.set_image(img)
         button.connect("clicked", stop_move)
 
 
@@ -342,11 +343,7 @@ def fly_mode(flybutton):
         button.connect("released", stop_move)
 
         button = builder.get_object("home")
-        image = builder.get_object("stopimg")
+        img = builder.get_object("homeimg")
         GObject.signal_handlers_destroy(button)
-        button.set_image(image)
+        button.set_image(img)
         button.connect("clicked", move_home)
-
-
-
-y
