@@ -596,10 +596,7 @@
             <property name="can_focus">False</property>
             <property name="label" translatable="yes">Voreinstellungen</property>
             <attributes>
-              <attribute name="font-desc" value="Source Sans Pro 12"/>
-              <attribute name="style" value="normal"/>
-              <attribute name="weight" value="light"/>
-              <attribute name="variant" value="small-caps"/>
+              <attribute name="font-desc" value="Source Sans Pro Light 12"/>
             </attributes>
           </object>
           <packing>
