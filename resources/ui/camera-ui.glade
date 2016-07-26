@@ -95,8 +95,6 @@
       <object class="GtkBox" id="boxinside1">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="margin_right">20</property>
-        <property name="margin_bottom">30</property>
         <property name="orientation">vertical</property>
         <child>
           <object class="GtkLabel">
@@ -626,7 +624,7 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="margin_top">5</property>
-            <property name="margin_bottom">16</property>
+            <property name="margin_bottom">31</property>
             <property name="row_spacing">2</property>
             <property name="column_spacing">2</property>
             <property name="row_homogeneous">True</property>
@@ -809,7 +807,6 @@
           <object class="GtkBox" id="scalebox">
             <property name="can_focus">False</property>
             <property name="no_show_all">True</property>
-            <property name="margin_top">15</property>
             <property name="orientation">vertical</property>
             <child>
               <object class="GtkLabel">
@@ -904,8 +901,6 @@
         <property name="can_focus">False</property>
         <property name="halign">start</property>
         <property name="valign">start</property>
-        <property name="margin_left">20</property>
-        <property name="margin_right">10</property>
         <property name="orientation">vertical</property>
         <child>
           <object class="GtkLabel">
