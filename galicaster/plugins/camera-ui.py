@@ -26,7 +26,7 @@ def init():
 
 
 def post_init(source=None):
-    global recorder_ui, scale, presetbutton, flybutton, builder, onoffbutton
+    global recorder_ui, scale, presetbutton, flybutton, builder, onoffbutton, prefbutton
 
 
     conf = context.get_conf().get_section(CONFIG_SECTION) or {}
@@ -123,6 +123,10 @@ def post_init(source=None):
     #reset all settings
     button = builder.get_object("reset")
     button.connect("clicked", reset)
+
+    #show/hide preferences
+    prefbutton = builder.get_object("pref")
+    prefbutton.connect("clicked", show_pref)
 
     #scales
     scale = builder.get_object("brightscale")
@@ -261,6 +265,28 @@ def turn_on_off(onoffbutton, self):
         pysca.set_power_on(DEFAULT_DEVICE, True)
     else:
         pysca.set_power_on(DEFAULT_DEVICE, False)
+
+#hides/shows the advanced preferences
+def show_pref(prefbutton):
+    label = builder.get_object("label_speed")
+    grid = builder.get_object("speedscale")
+    scales = builder.get_object("scalebox")
+    seperator = builder.get_object("speedsep")
+    #settings button activated
+    if prefbutton.get_active():
+        print ("show advanced settings")
+        label.show()
+        grid.show()
+        scales.show()
+        seperator.show()
+    #settings button deactivated
+    else:
+        print ("hide advanced settings")
+        label.hide()
+        grid.hide()
+        scales.hide()
+        seperator.hide()
+
 
 #flymode activation connects clicked signal and disconnects
 # pressed/released to keep the movement
