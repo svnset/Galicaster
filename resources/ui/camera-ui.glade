@@ -624,7 +624,7 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="margin_top">5</property>
-            <property name="margin_bottom">31</property>
+            <property name="margin_bottom">40</property>
             <property name="row_spacing">2</property>
             <property name="column_spacing">2</property>
             <property name="row_homogeneous">True</property>
@@ -772,8 +772,6 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="hexpand">False</property>
-                <property name="vexpand">False</property>
                 <property name="image">image9</property>
               </object>
               <packing>
@@ -939,7 +937,7 @@
             <property name="halign">center</property>
             <property name="valign">start</property>
             <property name="margin_top">5</property>
-            <property name="margin_bottom">60</property>
+            <property name="margin_bottom">70</property>
             <property name="active">True</property>
           </object>
           <packing>
