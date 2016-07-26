@@ -10,7 +10,7 @@ from galicaster.core import context
 from galicaster.classui import get_ui_path
 import galicaster.utils.pysca as pysca
 
-#DEFAULTS
+# DEFAULTS
 DEFAULT_DEVICE = 1
 CONFIG_SECTION = "camera-ui"
 PORT_KEY = "/dev/ttyS0"
@@ -26,26 +26,24 @@ def init():
 
 
 def post_init(source=None):
-    global recorder_ui, scale, presetbutton, flybutton, builder, onoffbutton, prefbutton
-
+    global recorder_ui, brightscale, movescale, zoomscale, presetbutton, flybutton, builder, onoffbutton, prefbutton
 
     conf = context.get_conf().get_section(CONFIG_SECTION) or {}
     recorder_ui = context.get_mainwindow().nbox.get_nth_page(0).gui
     notebook = recorder_ui.get_object("data_panel")
 
-
-    #implement glade file
+    # implement glade file
     builder = Gtk.Builder()
     builder.add_from_file(get_ui_path("camera-ui.glade"))
 
-    #add new settings tab to the notebook
+    # add new settings tab to the notebook
     label = Gtk.Label.new("Settings")
     tabbox = builder.get_object("box")
     tabbox.show_all()
     notebook.append_page(tabbox, label)
 
-    #buttons
-    #movement
+    # buttons
+    # movement
     button = builder.get_object("left")
     button.connect("pressed", move_left)
     button.connect("released", stop_move)
@@ -81,7 +79,7 @@ def post_init(source=None):
     button = builder.get_object("home")
     button.connect("clicked", move_home)
 
-    #zoom
+    # zoom
     button = builder.get_object("zoomin")
     button.connect("pressed", zoom_in)
     button.connect("released", stop_zoom)
@@ -90,7 +88,7 @@ def post_init(source=None):
     button.connect("pressed", zoom_out)
     button.connect("released", stop_zoom)
 
-    #presets
+    # presets
     button = builder.get_object("1")
     button.connect("clicked", preset1)
 
@@ -109,72 +107,73 @@ def post_init(source=None):
     button = builder.get_object("6")
     button.connect("clicked", preset6)
 
-    #to set a new preset
+    # to set a new preset
     presetbutton = builder.get_object("preset")
 
-    #fly-mode for camera-movement
+    # fly-mode for camera-movement
     flybutton = builder.get_object("fly")
     flybutton.connect("clicked", fly_mode)
 
-    #on-off button
+    # on-off button
     onoffbutton = builder.get_object("on-off")
     onoffbutton.connect("state-set", turn_on_off)
 
-    #reset all settings
+    # reset all settings
     button = builder.get_object("reset")
     button.connect("clicked", reset)
 
-    #show/hide preferences
+    # show/hide preferences
     prefbutton = builder.get_object("pref")
     prefbutton.connect("clicked", show_pref)
 
-    #scales
-    scale = builder.get_object("brightscale")
-    scale.connect("value-changed", set_bright)
+    # scales
+    brightscale = builder.get_object("brightscale")
+    brightscale.connect("value-changed", set_bright)
+    movescale = builder.get_object("movescale")
+    zoomscale = builder.get_object("zoomscale")
 
 
+# camera functions
 
-#camera functions
-
-#movement functions
+# movement functions
 def move_left(button):
     print ("I move left")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=-8)
+    pysca.pan_tilt(DEFAULT_DEVICE, pan=-movescale.get_value())
 
 
 def move_leftup(button):
     print ("I move leftup")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=-7, tilt=7)
+    pysca.pan_tilt(DEFAULT_DEVICE, pan=-movescale.get_value(), tilt=movescale.get_value())
 
 
 def move_leftdown(button):
     print ("I move leftdown")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=-7, tilt=-7)
+    pysca.pan_tilt(DEFAULT_DEVICE, pan=-movescale.get_value(), tilt=-movescale.get_value())
 
 
 def move_right(button):
     print ("I move right")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=8)
+    pysca.pan_tilt(DEFAULT_DEVICE, pan=movescale.get_value())
 
 
 def move_rightup(button):
     print ("I move rightup")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=7, tilt=7)
+    pysca.pan_tilt(DEFAULT_DEVICE, pan=movescale.get_value(), tilt=movescale.get_value())
 
 
 def move_rightdown(button):
     print ("I move rightdown")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=7, tilt=-7)
+    pysca.pan_tilt(DEFAULT_DEVICE, pan=movescale.get_value(), tilt=-movescale.get_value())
 
 
 def move_up(button):
     print ("I move up")
-    pysca.pan_tilt(DEFAULT_DEVICE, tilt=8)
+    pysca.pan_tilt(DEFAULT_DEVICE, tilt=movescale.get_value())
 
 
 def move_down(button):
     print ("I move down")
-    pysca.pan_tilt(DEFAULT_DEVICE, tilt=-8)
+    pysca.pan_tilt(DEFAULT_DEVICE, tilt=-movescale.get_value())
 
 
 def stop_move(button):
@@ -186,27 +185,31 @@ def move_home(button):
     print ("I move home")
     pysca.pan_tilt_home(DEFAULT_DEVICE)
 
-#zoom functions
+
+# zoom functions
 def zoom_in(button):
     print ("zoom in")
-    pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_TELE, speed=5)
+    pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_TELE, speed=zoomscale.get_value())
+
 
 def zoom_out(button):
     print ("zoom out")
-    pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_WIDE, speed=5)
+    pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_WIDE, speed=zoomscale.get_value())
+
 
 def stop_zoom(button):
     print ("stop zoom")
     pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_STOP)
 
-#preset functions
 
+# preset functions
 def preset1(button):
     if presetbutton.get_active():
         pysca.set_memory(DEFAULT_DEVICE, 0)
         presetbutton.set_active(False)
     else:
         pysca.recall_memory(DEFAULT_DEVICE, 0)
+
 
 def preset2(button):
     if presetbutton.get_active():
@@ -215,12 +218,14 @@ def preset2(button):
     else:
         pysca.recall_memory(DEFAULT_DEVICE, 1)
 
+
 def preset3(button):
     if presetbutton.get_active():
         pysca.set_memory(DEFAULT_DEVICE, 2)
         presetbutton.set_active(False)
     else:
         pysca.recall_memory(DEFAULT_DEVICE, 2)
+
 
 def preset4(button):
     if presetbutton.get_active():
@@ -229,12 +234,14 @@ def preset4(button):
     else:
         pysca.recall_memory(DEFAULT_DEVICE, 3)
 
+
 def preset5(button):
     if presetbutton.get_active():
         pysca.set_memory(DEFAULT_DEVICE, 4)
         presetbutton.set_active(False)
     else:
         pysca.recall_memory(DEFAULT_DEVICE, 4)
+
 
 def preset6(button):
     if presetbutton.get_active():
@@ -243,43 +250,49 @@ def preset6(button):
     else:
         pysca.recall_memory(DEFAULT_DEVICE, 5)
 
-#brightness scale
-def set_bright(scale):
-    pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
-    pysca.set_brightness(DEFAULT_DEVICE, scale.get_value()+15)
 
-#reset all settings
+# brightness scale
+def set_bright(brightscale):
+    pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
+    pysca.set_brightness(DEFAULT_DEVICE, brightscale.get_value() + 15)
+
+
+# reset all settings
 def reset(button):
-    #reset brightness
+    # reset brightness
     pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
     pysca.set_brightness(DEFAULT_DEVICE, 15)
-    scale.set_value(0)
-    #reset zoom
+    brightscale.set_value(0)
+    movescale.set_value(7)
+    zoomscale.set_value(5)
+    # reset zoom
     pysca.set_zoom(DEFAULT_DEVICE, 0000)
-    #reset location
+    # reset location
     pysca.pan_tilt_home(DEFAULT_DEVICE)
 
-#turns the camera on/off
+
+# turns the camera on/off
 def turn_on_off(onoffbutton, self):
     if onoffbutton.get_active():
         pysca.set_power_on(DEFAULT_DEVICE, True)
     else:
         pysca.set_power_on(DEFAULT_DEVICE, False)
 
-#hides/shows the advanced preferences
+
+# hides/shows the advanced preferences
 def show_pref(prefbutton):
     label = builder.get_object("label_speed")
     grid = builder.get_object("speedscale")
     scales = builder.get_object("scalebox")
     seperator = builder.get_object("speedsep")
-    #settings button activated
+    # settings button activated
     if prefbutton.get_active():
         print ("show advanced settings")
         label.show()
         grid.show()
         scales.show()
         seperator.show()
-    #settings button deactivated
+    # settings button deactivated
     else:
         print ("hide advanced settings")
         label.hide()
@@ -288,10 +301,10 @@ def show_pref(prefbutton):
         seperator.hide()
 
 
-#flymode activation connects clicked signal and disconnects
+# flymode activation connects clicked signal and disconnects
 # pressed/released to keep the movement
 def fly_mode(flybutton):
-    #fly mode turned on
+    # fly mode turned on
     if flybutton.get_active():
         print ("fly mode turned on")
         button = builder.get_object("left")
@@ -333,7 +346,7 @@ def fly_mode(flybutton):
         button.connect("clicked", stop_move)
 
 
-    #fly mode turned off
+    # fly mode turned off
     else:
         print("fly mode turned off")
 
