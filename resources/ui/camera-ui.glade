@@ -170,7 +170,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">Nach oben bewegen</property>
+                    <property name="tooltip_text" translatable="yes">Nach oben bewegen.</property>
                     <property name="hexpand">False</property>
                     <property name="vexpand">False</property>
                     <property name="image">image3</property>
@@ -186,7 +186,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">nach rechts-oben bewegen</property>
+                    <property name="tooltip_text" translatable="yes">Nach rechts-oben bewegen.</property>
                     <property name="hexpand">False</property>
                     <property name="vexpand">False</property>
                     <property name="relief">none</property>
@@ -201,7 +201,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">nach rechts bewegen</property>
+                    <property name="tooltip_text" translatable="yes">Nach rechts bewegen.</property>
                     <property name="hexpand">False</property>
                     <property name="vexpand">False</property>
                     <property name="image">image1</property>
@@ -217,7 +217,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">nach unten bewegen</property>
+                    <property name="tooltip_text" translatable="yes">Nach unten bewegen.</property>
                     <property name="hexpand">False</property>
                     <property name="vexpand">False</property>
                     <property name="image">image4</property>
@@ -233,7 +233,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">nach links-unten bewegen</property>
+                    <property name="tooltip_text" translatable="yes">Nach links-unten bewegen.</property>
                     <property name="hexpand">False</property>
                     <property name="vexpand">False</property>
                     <property name="relief">none</property>
@@ -248,7 +248,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">nach links bewegen</property>
+                    <property name="tooltip_text" translatable="yes">Nach links bewegen.</property>
                     <property name="hexpand">False</property>
                     <property name="vexpand">False</property>
                     <property name="image">image2</property>
@@ -264,7 +264,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">nach rechts-unten bewegen</property>
+                    <property name="tooltip_text" translatable="yes">Nach rechts-unten bewegen.</property>
                     <property name="hexpand">False</property>
                     <property name="vexpand">False</property>
                     <property name="relief">none</property>
@@ -303,7 +303,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">Hineinzoomen</property>
+                    <property name="tooltip_text" translatable="yes">Hineinzoomen.</property>
                     <property name="hexpand">False</property>
                     <property name="vexpand">False</property>
                     <property name="image">image7</property>
@@ -318,7 +318,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">Herauszoomen</property>
+                    <property name="tooltip_text" translatable="yes">Herauszoomen.</property>
                     <property name="hexpand">False</property>
                     <property name="vexpand">False</property>
                     <property name="image">image8</property>
@@ -772,6 +772,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="tooltip_text" translatable="yes">Aktiviert das Ändern der Voreinstellungen. (Fang-Modus)</property>
                 <property name="image">image9</property>
               </object>
               <packing>
@@ -980,6 +981,7 @@
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
+            <property name="tooltip_text" translatable="yes">Zeigt/Versteckt die erweiterten Einstellungen.</property>
             <property name="halign">center</property>
             <property name="margin_top">5</property>
             <property name="image">image5</property>
