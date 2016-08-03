@@ -9,6 +9,7 @@ from gi.repository import Gtk, GObject, Gdk
 from galicaster.core import context
 from galicaster.classui import get_ui_path
 import galicaster.utils.pysca as pysca
+from galicaster.classui.mainwindow import _
 
 # DEFAULTS
 DEFAULT_DEVICE = 1
@@ -32,12 +33,18 @@ def post_init(source=None):
     recorder_ui = context.get_mainwindow().nbox.get_nth_page(0).gui
 
     # load css file
-    css = Gtk.CssProvider.new()
+    cssold = Gtk.CssProvider.get_default()
+    css = Gtk.CssProvider()
     css.load_from_path(get_ui_path("camera-ui.css"))
+    Gtk.StyleContext.remove_provider_for_screen(
+        Gdk.Screen.get_default(),
+        cssold
+    )
+    Gtk.StyleContext.reset_widgets(Gdk.Screen.get_default())
     Gtk.StyleContext.add_provider_for_screen(
         Gdk.Screen.get_default(),
         css,
-        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        Gtk.STYLE_PROVIDER_PRIORITY_USER
     )
 
     # load glade file
