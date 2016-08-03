@@ -5,7 +5,7 @@ import gi
 
 gi.require_version("Gtk", "3.0")
 
-from gi.repository import Gtk, GObject
+from gi.repository import Gtk, GObject, Gdk
 from galicaster.core import context
 from galicaster.classui import get_ui_path
 import galicaster.utils.pysca as pysca
@@ -30,17 +30,28 @@ def post_init(source=None):
 
     conf = context.get_conf().get_section(CONFIG_SECTION) or {}
     recorder_ui = context.get_mainwindow().nbox.get_nth_page(0).gui
-    notebook = recorder_ui.get_object("data_panel")
 
-    # implement glade file
+    # load css file
+    css = Gtk.CssProvider.new()
+    css.load_from_path(get_ui_path("camera-ui.css"))
+    Gtk.StyleContext.add_provider_for_screen(
+        Gdk.Screen.get_default(),
+        css,
+        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+    )
+
+    # load glade file
     builder = Gtk.Builder()
     builder.add_from_file(get_ui_path("camera-ui.glade"))
 
     # add new settings tab to the notebook
-    label = Gtk.Label.new("Settings")
-    tabbox = builder.get_object("box")
-    tabbox.show_all()
-    notebook.append_page(tabbox, label)
+    notebook = recorder_ui.get_object("data_panel")
+    label = Gtk.Label.new("Control")
+    label.set_name("settingslabel")
+    mainbox = builder.get_object("mainbox")
+    mainbox.show_all()
+    notebook.append_page(mainbox, label)
+
 
     # buttons
     # movement
@@ -264,7 +275,7 @@ def reset(button):
     pysca.set_brightness(DEFAULT_DEVICE, 15)
     brightscale.set_value(0)
     movescale.set_value(7)
-    zoomscale.set_value(5)
+    zoomscale.set_value(3.5)
     # reset zoom
     pysca.set_zoom(DEFAULT_DEVICE, 0000)
     # reset location
@@ -281,24 +292,22 @@ def turn_on_off(onoffbutton, self):
 
 # hides/shows the advanced preferences
 def show_pref(prefbutton):
-    label = builder.get_object("label_speed")
-    grid = builder.get_object("speedscale")
-    scales = builder.get_object("scalebox")
-    seperator = builder.get_object("speedsep")
+    scalebox1 = builder.get_object("scales1")
+    scalebox2 = builder.get_object("scales2")
+    scalebox3 = builder.get_object("scales3")
     # settings button activated
-    if prefbutton.get_active():
-        print ("show advanced settings")
-        label.show()
-        grid.show()
-        scales.show()
-        seperator.show()
+    if scalebox1.get_property("visible"):
+        print ("hide advanced settings")
+        scalebox1.hide()
+        scalebox2.hide()
+        scalebox3.hide()
     # settings button deactivated
     else:
-        print ("hide advanced settings")
-        label.hide()
-        grid.hide()
-        scales.hide()
-        seperator.hide()
+        print ("show advanced settings")
+        scalebox1.show()
+        scalebox2.show()
+        scalebox3.show()
+
 
 
 # flymode activation connects clicked signal and disconnects

@@ -1,0 +1,101 @@
+#mainbox{
+    margin: 1px;
+    font: "Liberation Sans", sans-serif 12px;
+    font-weight: lighter;
+    color: grey;
+}
+#leftbox{
+    border-radius: 5px;
+    border-top: 1px solid lightgrey;
+    border-bottom: 1px solid lightgrey;
+    border-left: 1px solid lightgrey;
+    border-right: 0.5px solid lightgrey;
+    padding: 5px;
+    margin: 0;
+}
+#rightbox{
+    border-radius: 5px;
+    border-top: 1px solid lightgrey;
+    border-bottom: 1px solid lightgrey;
+    border-left: 0.5px solid lightgrey;
+    border-right: 1px solid lightgrey;
+    padding: 5px;
+    margin: 0;
+}
+#controlbuttons{
+    border: 0;
+    border-radius: 20px;
+    background: transparent;
+    padding: 5px;
+}
+#panelbuttons{
+    border: 1px solid lightgrey;
+    background: transparent;
+    margin: 2px;
+}
+#presetbuttons{
+    font: "Liberation Sans", sans-serif 8px;
+    font-weight: lighter;
+    color: grey;
+    border: 1px solid lightgrey;
+    background: transparent;
+    margin: 2px;
+}
+#panelbuttons:hover,
+#presetbuttons:hover{
+    background: radial-gradient(ghostwhite,lightgoldenrodyellow);
+}
+#panelbuttons:checked,
+#presetbuttons:checked{
+    background: radial-gradient(lightgrey, ghostwhite);
+}
+#controlbuttons:hover{
+    background: radial-gradient(ghostwhite,lightgoldenrodyellow);
+}
+#onoffbutton{
+    margin: 15px;
+}
+#onoffbutton:hover{
+    background: radial-gradient(ghostwhite,lightgoldenrodyellow);
+}
+
+#control{
+    border: 1px dotted lightgrey;
+    border-radius: 20px;
+    margin: 5px;
+}
+#controlpanel{
+    margin: 5px;
+}
+
+#descr_label{
+    font-size: 10px;
+    margin: 5px;
+}
+#title_label{
+    margin: 2px;
+}
+#scales{
+    font: "Liberation Sans", sans-serif 10px;
+    font-weight: lighter;
+    color: grey;
+    margin: 5px;
+}
+#title_box{
+    margin: 2px;
+}
+#titlebutton{
+    margin: 5px;
+    border: 1px solid lightgrey;
+    background: transparent;
+}
+#titlebutton:hover{
+    background: radial-gradient(ghostwhite,lightgoldenrodyellow);
+}
+#settingslabel{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 26px;
+    margin-left: 0;
+}
+
