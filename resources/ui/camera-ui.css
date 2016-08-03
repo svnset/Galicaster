@@ -43,20 +43,20 @@
 }
 #panelbuttons:hover,
 #presetbuttons:hover{
-    background: radial-gradient(ghostwhite,lightgoldenrodyellow);
+    background: linear-gradient(ghostwhite,lightgoldenrodyellow);
 }
 #panelbuttons:checked,
 #presetbuttons:checked{
-    background: radial-gradient(lightgrey, ghostwhite);
+    background: linear-gradient(lightgrey, ghostwhite);
 }
 #controlbuttons:hover{
-    background: radial-gradient(ghostwhite,lightgoldenrodyellow);
+    background: linear-gradient(ghostwhite,lightgoldenrodyellow);
 }
 #onoffbutton{
     margin: 15px;
 }
 #onoffbutton:hover{
-    background: radial-gradient(ghostwhite,lightgoldenrodyellow);
+    background: linear-gradient(ghostwhite,lightgoldenrodyellow);
 }
 
 #control{
@@ -90,7 +90,7 @@
     background: transparent;
 }
 #titlebutton:hover{
-    background: radial-gradient(ghostwhite,lightgoldenrodyellow);
+    background: linear-gradient(ghostwhite,lightgoldenrodyellow);
 }
 #settingslabel{
     margin-top: 10px;
