@@ -1,5 +1,5 @@
+/*BOXES*/
 #mainbox{
-    margin: 1px;
     font: "Liberation Sans", sans-serif 12px;
     font-weight: lighter;
     color: grey;
@@ -10,8 +10,6 @@
     border-bottom: 1px solid lightgrey;
     border-left: 1px solid lightgrey;
     border-right: 0.5px solid lightgrey;
-    padding: 5px;
-    margin: 0;
 }
 #rightbox{
     border-radius: 5px;
@@ -19,8 +17,29 @@
     border-bottom: 1px solid lightgrey;
     border-left: 0.5px solid lightgrey;
     border-right: 1px solid lightgrey;
-    padding: 5px;
-    margin: 0;
+}
+#title_box{
+}
+/*leftbox*/
+#onoffbox{
+}
+#scales{
+    font: "Liberation Sans", sans-serif 10px;
+    font-weight: lighter;
+    color: grey;
+}
+/*rightbox*/
+#controlpanel{
+}
+#control{
+    border: 1px dotted lightgrey;
+    border-radius: 5px;
+}
+
+/*BUTTONS*/
+#titlebutton{
+    border: 1px solid lightgrey;
+    background: transparent;
 }
 #controlbuttons{
     border: 0;
@@ -31,7 +50,6 @@
 #panelbuttons{
     border: 1px solid lightgrey;
     background: transparent;
-    margin: 2px;
 }
 #presetbuttons{
     font: "Liberation Sans", sans-serif 8px;
@@ -39,7 +57,13 @@
     color: grey;
     border: 1px solid lightgrey;
     background: transparent;
-    margin: 2px;
+}
+
+/*BUTTONEFFECTS*/
+#titlebutton:hover{
+    background: linear-gradient(ghostwhite,lightgoldenrodyellow);
+}
+#onoffbutton:hover{
 }
 #panelbuttons:hover,
 #presetbuttons:hover{
@@ -52,50 +76,12 @@
 #controlbuttons:hover{
     background: linear-gradient(ghostwhite,lightgoldenrodyellow);
 }
-#onoffbutton{
-    margin: 15px;
-}
-#onoffbutton:hover{
-    background: linear-gradient(ghostwhite,lightgoldenrodyellow);
-}
 
-#control{
-    border: 1px dotted lightgrey;
-    border-radius: 200px;
-    margin: 20px;
-}
-#controlpanel{
-    margin: 5px;
-}
-
+/*LABELS*/
 #descr_label{
     font-size: 10px;
-    margin: 5px;
 }
 #title_label{
-    margin: 2px;
 }
-#scales{
-    font: "Liberation Sans", sans-serif 10px;
-    font-weight: lighter;
-    color: grey;
-    margin: 5px;
-}
-#title_box{
-    margin: 2px;
-}
-#titlebutton{
-    margin: 5px;
-    border: 1px solid lightgrey;
-    background: transparent;
-}
-#titlebutton:hover{
-    background: linear-gradient(ghostwhite,lightgoldenrodyellow);
-}
-#settingslabel{
-    margin-top: 10px;
-    margin-bottom: 10px;
-    margin-right: 26px;
-    margin-left: 0;
-}
+
 

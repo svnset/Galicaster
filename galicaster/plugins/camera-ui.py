@@ -50,32 +50,10 @@ def post_init(source=None):
 
     # add new settings tab to the notebook
     notebook = recorder_ui.get_object("data_panel")
-    label = Gtk.Label.new("Control")
-    label.set_name("settingslabel")
     mainbox = builder.get_object("mainbox")
+    label = builder.get_object("notebooklabel")
     mainbox.show_all()
     notebook.append_page(mainbox, label)
-
-    stylecontext =  notebook.get_style_context()
-    stylecontext.remove_provider_for_screen(
-        Gdk.Screen.get_default(),
-        cssold
-    )
-    stylecontext.remove_provider(
-        cssold
-    )
-    stylecontext.reset_widgets(Gdk.Screen.get_default())
-
-    stylecontext.add_provider_for_screen(
-        Gdk.Screen.get_default(),
-        css,
-        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-    )
-    stylecontext.add_provider(
-        css,
-        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-    )
-
 
 
     # buttons
