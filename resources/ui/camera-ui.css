@@ -61,8 +61,8 @@
 
 #control{
     border: 1px dotted lightgrey;
-    border-radius: 20px;
-    margin: 5px;
+    border-radius: 200px;
+    margin: 20px;
 }
 #controlpanel{
     margin: 5px;

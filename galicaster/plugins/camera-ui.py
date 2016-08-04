@@ -36,15 +36,12 @@ def post_init(source=None):
     cssold = Gtk.CssProvider.get_default()
     css = Gtk.CssProvider()
     css.load_from_path(get_ui_path("camera-ui.css"))
-    Gtk.StyleContext.remove_provider_for_screen(
-        Gdk.Screen.get_default(),
-        cssold
-    )
+
     Gtk.StyleContext.reset_widgets(Gdk.Screen.get_default())
     Gtk.StyleContext.add_provider_for_screen(
         Gdk.Screen.get_default(),
         css,
-        Gtk.STYLE_PROVIDER_PRIORITY_USER
+        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
     )
 
     # load glade file
@@ -58,6 +55,27 @@ def post_init(source=None):
     mainbox = builder.get_object("mainbox")
     mainbox.show_all()
     notebook.append_page(mainbox, label)
+
+    stylecontext =  notebook.get_style_context()
+    stylecontext.remove_provider_for_screen(
+        Gdk.Screen.get_default(),
+        cssold
+    )
+    stylecontext.remove_provider(
+        cssold
+    )
+    stylecontext.reset_widgets(Gdk.Screen.get_default())
+
+    stylecontext.add_provider_for_screen(
+        Gdk.Screen.get_default(),
+        css,
+        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+    )
+    stylecontext.add_provider(
+        css,
+        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+    )
+
 
 
     # buttons

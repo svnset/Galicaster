@@ -1,21 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.20.0 -->
+<!-- Generated with glade 3.18.3 -->
 <interface>
   <requires lib="gtk+" version="3.18"/>
-  <object class="GtkBox">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="orientation">vertical</property>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-  </object>
   <object class="GtkAdjustment" id="brightadjustment">
     <property name="lower">-15</property>
     <property name="upper">15</property>
@@ -153,18 +139,6 @@
           </packing>
         </child>
         <child>
-          <object class="GtkSeparator">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="hexpand">True</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-        <child>
           <object class="GtkBox" id="onoff">
             <property name="name">onoffbutton</property>
             <property name="visible">True</property>
@@ -208,11 +182,11 @@
         </child>
         <child>
           <object class="GtkBox" id="scales1">
+            <property name="name">scales</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
               <object class="GtkScale" id="brightscale">
-                <property name="name">scales</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="tooltip_text" translatable="yes">Skalieren der Helligkeit.</property>
@@ -250,11 +224,11 @@
         </child>
         <child>
           <object class="GtkBox" id="scales2">
+            <property name="name">scales</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
               <object class="GtkScale" id="movescale">
-                <property name="name">scales</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="tooltip_text" translatable="yes">Skalieren der Steuerungs-Geschwindigkeit.</property>
@@ -293,11 +267,11 @@
         </child>
         <child>
           <object class="GtkBox" id="scales3">
+            <property name="name">scales</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
               <object class="GtkScale" id="zoomscale">
-                <property name="name">scales</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="tooltip_text" translatable="yes">Skalieren der Zoom-Geschwindigkeit.</property>
@@ -388,18 +362,6 @@
             <property name="expand">False</property>
             <property name="fill">True</property>
             <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkSeparator">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="hexpand">True</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
           </packing>
         </child>
         <child>
