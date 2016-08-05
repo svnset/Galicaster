@@ -12,6 +12,7 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="stock">gtk-go-down</property>
+    <property name="icon_size">5</property>
   </object>
   <object class="GtkImage" id="dummyimg">
     <property name="visible">True</property>
@@ -27,11 +28,13 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="stock">gtk-home</property>
+    <property name="icon_size">5</property>
   </object>
   <object class="GtkImage" id="leftimg">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="stock">gtk-go-back</property>
+    <property name="icon_size">5</property>
   </object>
   <object class="GtkAdjustment" id="moveadjustment">
     <property name="upper">14</property>
@@ -61,6 +64,7 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="stock">gtk-go-forward</property>
+    <property name="icon_size">5</property>
   </object>
   <object class="GtkImage" id="settingsimg">
     <property name="visible">True</property>
@@ -71,11 +75,13 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="stock">gtk-media-stop</property>
+    <property name="icon_size">5</property>
   </object>
   <object class="GtkImage" id="upimg">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="stock">gtk-go-up</property>
+    <property name="icon_size">5</property>
   </object>
   <object class="GtkAdjustment" id="zoomadjustment">
     <property name="upper">7</property>
@@ -200,21 +206,34 @@
             <property name="name">scales</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">40</property>
+            <property name="margin_left">50</property>
             <property name="margin_bottom">5</property>
             <property name="spacing">10</property>
+            <property name="homogeneous">True</property>
             <child>
-              <object class="GtkScale" id="brightscale">
+              <object class="GtkBox" id="scalebox1">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="tooltip_text" translatable="yes">Skalieren der Helligkeit.</property>
-                <property name="adjustment">brightadjustment</property>
-                <property name="round_digits">0</property>
-                <property name="digits">0</property>
-                <property name="value_pos">left</property>
+                <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkScale" id="brightscale">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="tooltip_text" translatable="yes">Skalieren der Helligkeit.</property>
+                    <property name="adjustment">brightadjustment</property>
+                    <property name="round_digits">0</property>
+                    <property name="digits">0</property>
+                    <property name="value_pos">left</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
               </object>
               <packing>
-                <property name="expand">True</property>
+                <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">0</property>
               </packing>
@@ -228,7 +247,7 @@
                 <property name="xalign">0</property>
               </object>
               <packing>
-                <property name="expand">True</property>
+                <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">1</property>
               </packing>
@@ -245,21 +264,35 @@
             <property name="name">scales</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">40</property>
+            <property name="margin_left">50</property>
             <property name="margin_bottom">5</property>
             <property name="spacing">10</property>
+            <property name="homogeneous">True</property>
             <child>
-              <object class="GtkScale" id="movescale">
+              <object class="GtkBox" id="scalebox2">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="tooltip_text" translatable="yes">Skalieren der Steuerungs-Geschwindigkeit.</property>
-                <property name="adjustment">moveadjustment</property>
-                <property name="round_digits">0</property>
-                <property name="digits">0</property>
-                <property name="value_pos">left</property>
+                <property name="can_focus">False</property>
+                <property name="margin_left">5</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkScale" id="movescale">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="tooltip_text" translatable="yes">Skalieren der Steuerungs-Geschwindigkeit.</property>
+                    <property name="adjustment">moveadjustment</property>
+                    <property name="round_digits">0</property>
+                    <property name="digits">0</property>
+                    <property name="value_pos">left</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
               </object>
               <packing>
-                <property name="expand">True</property>
+                <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">0</property>
               </packing>
@@ -273,7 +306,7 @@
                 <property name="xalign">0</property>
               </object>
               <packing>
-                <property name="expand">True</property>
+                <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">1</property>
               </packing>
@@ -290,21 +323,35 @@
             <property name="name">scales</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">40</property>
+            <property name="margin_left">50</property>
             <property name="margin_bottom">5</property>
             <property name="spacing">10</property>
+            <property name="homogeneous">True</property>
             <child>
-              <object class="GtkScale" id="zoomscale">
+              <object class="GtkBox" id="scalebox3">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="tooltip_text" translatable="yes">Skalieren der Zoom-Geschwindigkeit.</property>
-                <property name="adjustment">zoomadjustment</property>
-                <property name="round_digits">0</property>
-                <property name="digits">0</property>
-                <property name="value_pos">left</property>
+                <property name="can_focus">False</property>
+                <property name="margin_left">13</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkScale" id="zoomscale">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="tooltip_text" translatable="yes">Skalieren der Zoom-Geschwindigkeit.</property>
+                    <property name="adjustment">zoomadjustment</property>
+                    <property name="round_digits">0</property>
+                    <property name="digits">0</property>
+                    <property name="value_pos">left</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
               </object>
               <packing>
-                <property name="expand">True</property>
+                <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">0</property>
               </packing>
@@ -314,11 +361,12 @@
                 <property name="name">descr_label</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="halign">start</property>
                 <property name="label" translatable="yes">Zoom</property>
                 <property name="xalign">0</property>
               </object>
               <packing>
-                <property name="expand">True</property>
+                <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">1</property>
               </packing>
@@ -393,313 +441,333 @@
           </packing>
         </child>
         <child>
-          <object class="GtkGrid" id="ctrlpanel">
-            <property name="name">controlpanel</property>
+          <object class="GtkBox" id="ctrl">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="halign">center</property>
-            <property name="valign">center</property>
-            <property name="margin_bottom">5</property>
-            <property name="row_spacing">2</property>
-            <property name="column_homogeneous">True</property>
             <child>
-              <object class="GtkBox" id="zoom">
+              <object class="GtkGrid" id="ctrlpanel">
+                <property name="name">controlpanel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="halign">center</property>
-                <property name="valign">center</property>
-                <property name="margin_left">5</property>
-                <property name="margin_bottom">5</property>
-                <property name="hexpand">False</property>
-                <property name="vexpand">False</property>
-                <property name="spacing">2</property>
+                <property name="valign">start</property>
+                <property name="margin_left">20</property>
+                <property name="margin_bottom">10</property>
+                <property name="row_spacing">2</property>
                 <child>
-                  <object class="GtkButton" id="zoomin">
+                  <object class="GtkBox" id="zoom">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <property name="margin_left">5</property>
+                    <property name="margin_right">5</property>
+                    <property name="hexpand">False</property>
+                    <property name="vexpand">False</property>
+                    <property name="spacing">2</property>
+                    <child>
+                      <object class="GtkButton" id="zoomin">
+                        <property name="name">panelbuttons</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_text" translatable="yes">Hineinzoomen.</property>
+                        <property name="hexpand">False</property>
+                        <property name="vexpand">False</property>
+                        <property name="image">zoominimg</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="zoomout">
+                        <property name="name">panelbuttons</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_text" translatable="yes">Herauszoomen.</property>
+                        <property name="hexpand">False</property>
+                        <property name="vexpand">False</property>
+                        <property name="image">zoomoutimg</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="label_zoom">
+                    <property name="name">descr_label</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <property name="margin_left">5</property>
+                    <property name="margin_right">5</property>
+                    <property name="margin_top">5</property>
+                    <property name="label" translatable="yes">Zoom</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="label_fly">
+                    <property name="name">descr_label</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <property name="margin_left">5</property>
+                    <property name="margin_right">5</property>
+                    <property name="margin_top">5</property>
+                    <property name="label" translatable="yes">FLugmodus</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkToggleButton" id="fly">
                     <property name="name">panelbuttons</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">Hineinzoomen.</property>
+                    <property name="tooltip_text" translatable="yes">Aktiviert den Flug-Modus.</property>
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <property name="margin_left">5</property>
+                    <property name="margin_right">5</property>
                     <property name="hexpand">False</property>
                     <property name="vexpand">False</property>
-                    <property name="image">zoominimg</property>
+                    <property name="image">flyimg</property>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">3</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton" id="zoomout">
+                  <object class="GtkLabel" id="label_reset">
+                    <property name="name">descr_label</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <property name="margin_left">5</property>
+                    <property name="margin_right">5</property>
+                    <property name="margin_top">5</property>
+                    <property name="label" translatable="yes">Reset</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">4</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="reset">
                     <property name="name">panelbuttons</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">Herauszoomen.</property>
+                    <property name="tooltip_text" translatable="yes">Setzt alle Einstellungen auf ihre Standard-Werte zurück.</property>
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <property name="margin_left">5</property>
+                    <property name="margin_right">5</property>
+                    <property name="margin_bottom">5</property>
                     <property name="hexpand">False</property>
                     <property name="vexpand">False</property>
-                    <property name="image">zoomoutimg</property>
+                    <property name="image">resetimg</property>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">1</property>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">5</property>
                   </packing>
                 </child>
               </object>
               <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">1</property>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
-              <object class="GtkToggleButton" id="fly">
-                <property name="name">panelbuttons</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="tooltip_text" translatable="yes">Aktiviert den Flug-Modus.</property>
-                <property name="halign">center</property>
-                <property name="valign">center</property>
-                <property name="margin_bottom">5</property>
-                <property name="hexpand">False</property>
-                <property name="vexpand">False</property>
-                <property name="image">flyimg</property>
-              </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="reset">
-                <property name="name">panelbuttons</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="tooltip_text" translatable="yes">Setzt alle Einstellungen auf ihre Standard-Werte zurück.</property>
-                <property name="halign">center</property>
-                <property name="valign">center</property>
-                <property name="margin_bottom">5</property>
-                <property name="hexpand">False</property>
-                <property name="vexpand">False</property>
-                <property name="image">resetimg</property>
-              </object>
-              <packing>
-                <property name="left_attach">2</property>
-                <property name="top_attach">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="label_fly">
-                <property name="name">descr_label</property>
+              <object class="GtkGrid" id="ctrlfield">
+                <property name="name">control</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="halign">center</property>
                 <property name="valign">center</property>
-                <property name="margin_top">5</property>
-                <property name="label" translatable="yes">FLugmodus</property>
+                <property name="margin_left">50</property>
+                <property name="margin_bottom">10</property>
+                <property name="row_spacing">2</property>
+                <property name="column_spacing">2</property>
+                <property name="column_homogeneous">True</property>
+                <child>
+                  <object class="GtkButton" id="home">
+                    <property name="name">controlbuttons</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="tooltip_text" translatable="yes">In Home-Position zurückkehren.</property>
+                    <property name="hexpand">False</property>
+                    <property name="vexpand">False</property>
+                    <property name="image">homeimg</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="leftup">
+                    <property name="name">controlbuttons</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="tooltip_text" translatable="yes">Nach links-oben bewegen.</property>
+                    <property name="hexpand">False</property>
+                    <property name="vexpand">False</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="up">
+                    <property name="name">controlbuttons</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="tooltip_text" translatable="yes">Nach oben bewegen.</property>
+                    <property name="hexpand">False</property>
+                    <property name="vexpand">False</property>
+                    <property name="image">upimg</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="rightup">
+                    <property name="name">controlbuttons</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="tooltip_text" translatable="yes">Nach rechts-oben bewegen.</property>
+                    <property name="hexpand">False</property>
+                    <property name="vexpand">False</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">2</property>
+                    <property name="top_attach">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="right">
+                    <property name="name">controlbuttons</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="tooltip_text" translatable="yes">Nach rechts bewegen.</property>
+                    <property name="hexpand">False</property>
+                    <property name="vexpand">False</property>
+                    <property name="image">rightimg</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">2</property>
+                    <property name="top_attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="down">
+                    <property name="name">controlbuttons</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="tooltip_text" translatable="yes">Nach unten bewegen.</property>
+                    <property name="hexpand">False</property>
+                    <property name="vexpand">False</property>
+                    <property name="image">downimg</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="leftdown">
+                    <property name="name">controlbuttons</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="tooltip_text" translatable="yes">Nach links-unten bewegen.</property>
+                    <property name="hexpand">False</property>
+                    <property name="vexpand">False</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="left">
+                    <property name="name">controlbuttons</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="tooltip_text" translatable="yes">Nach links bewegen.</property>
+                    <property name="hexpand">False</property>
+                    <property name="vexpand">False</property>
+                    <property name="image">leftimg</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="rightdown">
+                    <property name="name">controlbuttons</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="tooltip_text" translatable="yes">Nach rechts-unten bewegen.</property>
+                    <property name="hexpand">False</property>
+                    <property name="vexpand">False</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">2</property>
+                    <property name="top_attach">2</property>
+                  </packing>
+                </child>
               </object>
               <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="label_zoom">
-                <property name="name">descr_label</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="halign">center</property>
-                <property name="valign">center</property>
-                <property name="margin_left">5</property>
-                <property name="margin_top">5</property>
-                <property name="label" translatable="yes">Zoom</property>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="label_reset">
-                <property name="name">descr_label</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="halign">center</property>
-                <property name="valign">center</property>
-                <property name="margin_top">5</property>
-                <property name="label" translatable="yes">Reset</property>
-              </object>
-              <packing>
-                <property name="left_attach">2</property>
-                <property name="top_attach">0</property>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
               </packing>
             </child>
           </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">2</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkGrid" id="ctrlfield">
-            <property name="name">control</property>
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="halign">center</property>
-            <property name="valign">center</property>
-            <property name="margin_bottom">10</property>
-            <property name="row_spacing">2</property>
-            <property name="column_spacing">2</property>
-            <property name="column_homogeneous">True</property>
-            <child>
-              <object class="GtkButton" id="home">
-                <property name="name">controlbuttons</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="tooltip_text" translatable="yes">In Home-Position zurückkehren.</property>
-                <property name="hexpand">False</property>
-                <property name="vexpand">False</property>
-                <property name="image">homeimg</property>
-              </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="leftup">
-                <property name="name">controlbuttons</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="tooltip_text" translatable="yes">Nach links-oben bewegen.</property>
-                <property name="hexpand">False</property>
-                <property name="vexpand">False</property>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="up">
-                <property name="name">controlbuttons</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="tooltip_text" translatable="yes">Nach oben bewegen.</property>
-                <property name="hexpand">False</property>
-                <property name="vexpand">False</property>
-                <property name="image">upimg</property>
-              </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="rightup">
-                <property name="name">controlbuttons</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="tooltip_text" translatable="yes">Nach rechts-oben bewegen.</property>
-                <property name="hexpand">False</property>
-                <property name="vexpand">False</property>
-              </object>
-              <packing>
-                <property name="left_attach">2</property>
-                <property name="top_attach">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="right">
-                <property name="name">controlbuttons</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="tooltip_text" translatable="yes">Nach rechts bewegen.</property>
-                <property name="hexpand">False</property>
-                <property name="vexpand">False</property>
-                <property name="image">rightimg</property>
-              </object>
-              <packing>
-                <property name="left_attach">2</property>
-                <property name="top_attach">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="down">
-                <property name="name">controlbuttons</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="tooltip_text" translatable="yes">Nach unten bewegen.</property>
-                <property name="hexpand">False</property>
-                <property name="vexpand">False</property>
-                <property name="image">downimg</property>
-              </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">2</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="leftdown">
-                <property name="name">controlbuttons</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="tooltip_text" translatable="yes">Nach links-unten bewegen.</property>
-                <property name="hexpand">False</property>
-                <property name="vexpand">False</property>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">2</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="left">
-                <property name="name">controlbuttons</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="tooltip_text" translatable="yes">Nach links bewegen.</property>
-                <property name="hexpand">False</property>
-                <property name="vexpand">False</property>
-                <property name="image">leftimg</property>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="rightdown">
-                <property name="name">controlbuttons</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="tooltip_text" translatable="yes">Nach rechts-unten bewegen.</property>
-                <property name="hexpand">False</property>
-                <property name="vexpand">False</property>
-              </object>
-              <packing>
-                <property name="left_attach">2</property>
-                <property name="top_attach">2</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">3</property>
+            <property name="position">1</property>
           </packing>
         </child>
         <child>
@@ -709,6 +777,8 @@
             <property name="can_focus">False</property>
             <property name="halign">center</property>
             <property name="valign">center</property>
+            <property name="margin_left">40</property>
+            <property name="margin_top">5</property>
             <property name="spacing">5</property>
             <child>
               <object class="GtkGrid" id="preset_memories">

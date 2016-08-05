@@ -1,8 +1,8 @@
 /*BOXES*/
 #mainbox{
-    font: "Liberation Sans", sans-serif 12px;
+    font: sans-serif 12px;
     font-weight: lighter;
-    color: grey;
+    color: black;
 }
 #leftbox{
     border-radius: 5px;
@@ -25,9 +25,9 @@
 #onoffbox{
 }
 #scales{
-    font: "Liberation Sans", sans-serif 8px;
+    font: sans-serif 8px;
     font-weight: lighter;
-    color: grey;
+    color: black;
     border-bottom: 1px dashed lightgrey;
 }
 /*rightbox*/
@@ -53,11 +53,11 @@
 }
 #panelbuttons{
     border: 1px solid lightgrey;
-    background: transparent;
+    background: repeating-linear-gradient(transparent, transparent);
     border-radius: 5px;
 }
 #presetbuttons{
-    font: "Liberation Sans", sans-serif 6px;
+    font: sans-serif 6px;
     font-weight: lighter;
     color: grey;
     border: 1px solid lightgrey;
