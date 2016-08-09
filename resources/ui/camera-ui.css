@@ -42,9 +42,8 @@
 
 /*BUTTONS*/
 #titlebutton{
-    border: 1px solid lightgrey;
-    background: transparent;
     border-radius: 5px;
+	border: 1px solid shade(gray,1.5);
 }
 #controlbuttons{
     border: 0;
@@ -52,17 +51,16 @@
     background: transparent;
 }
 #panelbuttons{
-    border: 1px solid lightgrey;
-    background: repeating-linear-gradient(transparent, transparent);
     border-radius: 5px;
+	border: 1px solid shade(gray,1.5);
 }
 #presetbuttons{
     font: sans-serif 6px;
     font-weight: lighter;
     color: grey;
-    border: 1px solid lightgrey;
     border-radius: 5px;
-    background: transparent;
+	border: 1px solid shade(gray,1.5);
+
 }
 #onoffbutton{
     border-radius: 5px;

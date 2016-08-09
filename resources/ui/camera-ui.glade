@@ -120,7 +120,6 @@
             <property name="valign">center</property>
             <property name="margin_top">5</property>
             <property name="margin_bottom">10</property>
-            <property name="spacing">5</property>
             <child>
               <object class="GtkButton" id="pref">
                 <property name="name">titlebutton</property>
@@ -142,6 +141,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="margin_bottom">5</property>
+                <property name="xpad">10</property>
                 <property name="label" translatable="yes">Einstellungen</property>
               </object>
               <packing>
@@ -401,7 +401,6 @@
             <property name="valign">center</property>
             <property name="margin_top">5</property>
             <property name="margin_bottom">10</property>
-            <property name="spacing">5</property>
             <child>
               <object class="GtkButton" id="dummy">
                 <property name="name">titlebutton</property>
@@ -425,6 +424,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="margin_bottom">5</property>
+                <property name="xpad">10</property>
                 <property name="label" translatable="yes">Steuerung</property>
               </object>
               <packing>
