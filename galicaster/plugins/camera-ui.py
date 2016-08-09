@@ -12,9 +12,26 @@ import galicaster.utils.pysca as pysca
 from galicaster.classui.mainwindow import _
 
 # DEFAULTS
+# This is the default Visca device this plugin talks to
 DEFAULT_DEVICE = 1
+
+# This is the default preset to set when the camera is recording
+DEFAULT_RECORD_PRESET = 0
+
+# This is the default preset to set when the camera is switching off
+DEFAULT_IDLE_PRESET = 5
+
+# This is the name of this plugin's section in the configuration file
 CONFIG_SECTION = "camera-ui"
-PORT_KEY = "/dev/ttyS0"
+
+# This is the key containing the port (path to the device) to use when recording
+PORT_KEY = "port"
+
+# This is the key containing the preset to use when recording
+RECORD_PRESET_KEY = 'record-preset'
+
+# This is the key containing the preset to set the camera to just after switching it off
+IDLE_PRESET_KEY= 'idle-preset'
 
 
 def init():
@@ -23,12 +40,19 @@ def init():
     dispatcher = context.get_dispatcher()
     recorder = context.get_recorder()
     dispatcher.connect("init", post_init)
-    pysca.connect(PORT_KEY)
+
+    # If port is not defined, a None value will make this method fail
+    pysca.connect(context.get_conf().get(CONFIG_SECTION, PORT_KEY))
+
+    dispatcher.connect('starting-record', on_start_recording)
+    # We don't have such thing as a "post-stop" signal, so we have to live with what we do have
+    dispatcher.connect('restart-preview', on_stop_recording)
 
 
 def post_init(source=None):
     global recorder_ui, brightscale, movescale, zoomscale, presetbutton, flybutton, builder, onoffbutton, prefbutton
 
+    # Get a shallow copy of this plugin's configuration
     conf = context.get_conf().get_section(CONFIG_SECTION) or {}
     recorder_ui = context.get_mainwindow().nbox.get_nth_page(0).gui
 
@@ -407,3 +431,33 @@ def fly_mode(flybutton):
         GObject.signal_handlers_destroy(button)
         button.set_image(img)
         button.connect("clicked", move_home)
+
+
+
+def on_start_recording(elem):
+
+    global logger
+
+    # Get a shallow copy of this plugin's configuration
+    config = context.get_conf().get_section(CONFIG_SECTION) or {}
+
+    try:
+        pysca.set_power_on(DEFAULT_DEVICE, True)
+        pysca.recall_memory(DEFAULT_DEVICE, config.get(RECORD_PRESET_KEY, DEFAULT_RECORD_PRESET))
+
+    except Exception as e:
+        logger.warn("Error accessing the Visca device %u on recording start. The recording may be incorrect! Error: %s" % (DEFAULT_DEVICE, e))
+
+
+def on_stop_recording(elem):
+
+    global logger
+
+    # Get a shallow copy of this plugin's configuration
+    config = context.get_conf().get_section(CONFIG_SECTION) or {}
+
+    try:
+        pysca.recall_memory(DEFAULT_DEVICE, config.get(IDLE_PRESET_KEY, DEFAULT_IDLE_PRESET))
+        pysca.set_power_on(DEFAULT_DEVICE, False)
+    except Exception as e:
+        logger.warn("Error accessing the Visca device %u on recording end. The recording may be incorrect! Error: %s" % (DEFAULT_DEVICE, e))
