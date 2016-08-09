@@ -206,7 +206,7 @@
             <property name="name">scales</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">50</property>
+            <property name="margin_left">60</property>
             <property name="margin_bottom">5</property>
             <property name="spacing">10</property>
             <property name="homogeneous">True</property>
@@ -264,7 +264,7 @@
             <property name="name">scales</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">50</property>
+            <property name="margin_left">60</property>
             <property name="margin_bottom">5</property>
             <property name="spacing">10</property>
             <property name="homogeneous">True</property>
@@ -272,7 +272,7 @@
               <object class="GtkBox" id="scalebox2">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="margin_left">5</property>
+                <property name="margin_left">4</property>
                 <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkScale" id="movescale">
@@ -323,7 +323,7 @@
             <property name="name">scales</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">50</property>
+            <property name="margin_left">60</property>
             <property name="margin_bottom">5</property>
             <property name="spacing">10</property>
             <property name="homogeneous">True</property>
@@ -331,7 +331,7 @@
               <object class="GtkBox" id="scalebox3">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="margin_left">13</property>
+                <property name="margin_left">11</property>
                 <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkScale" id="zoomscale">
