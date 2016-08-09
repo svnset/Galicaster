@@ -444,15 +444,15 @@
           <object class="GtkBox" id="ctrl">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="margin_left">40</property>
+            <property name="margin_bottom">5</property>
             <child>
               <object class="GtkGrid" id="ctrlpanel">
                 <property name="name">controlpanel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="halign">center</property>
+                <property name="halign">start</property>
                 <property name="valign">start</property>
-                <property name="margin_left">20</property>
-                <property name="margin_bottom">10</property>
                 <property name="row_spacing">2</property>
                 <child>
                   <object class="GtkBox" id="zoom">
@@ -611,8 +611,7 @@
                 <property name="can_focus">False</property>
                 <property name="halign">center</property>
                 <property name="valign">center</property>
-                <property name="margin_left">50</property>
-                <property name="margin_bottom">10</property>
+                <property name="margin_left">40</property>
                 <property name="row_spacing">2</property>
                 <property name="column_spacing">2</property>
                 <property name="column_homogeneous">True</property>
@@ -775,10 +774,10 @@
             <property name="name">presets</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="halign">center</property>
+            <property name="halign">start</property>
             <property name="valign">center</property>
             <property name="margin_left">40</property>
-            <property name="margin_top">5</property>
+            <property name="margin_bottom">20</property>
             <property name="spacing">5</property>
             <child>
               <object class="GtkGrid" id="preset_memories">
