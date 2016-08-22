@@ -129,6 +129,7 @@
                 <property name="receives_default">True</property>
                 <property name="margin_bottom">5</property>
                 <property name="image">settingsimg</property>
+                <property name="relief">none</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -663,9 +664,6 @@ laden/speichern</property>
           <object class="GtkBox" id="ctrl">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">40</property>
-            <property name="margin_right">40</property>
-            <property name="spacing">10</property>
             <child>
               <object class="GtkGrid" id="ctrlpanel">
                 <property name="name">controlpanel</property>
@@ -673,6 +671,8 @@ laden/speichern</property>
                 <property name="can_focus">False</property>
                 <property name="halign">start</property>
                 <property name="valign">start</property>
+                <property name="margin_left">40</property>
+                <property name="margin_right">20</property>
                 <property name="row_spacing">2</property>
                 <child>
                   <object class="GtkBox" id="zoom">
@@ -831,6 +831,7 @@ laden/speichern</property>
                 <property name="can_focus">False</property>
                 <property name="halign">center</property>
                 <property name="valign">center</property>
+                <property name="margin_right">40</property>
                 <property name="row_spacing">2</property>
                 <property name="column_spacing">2</property>
                 <property name="column_homogeneous">True</property>
