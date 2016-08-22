@@ -44,9 +44,9 @@ def init():
     # If port is not defined, a None value will make this method fail
     pysca.connect(context.get_conf().get(CONFIG_SECTION, PORT_KEY))
 
-    dispatcher.connect('starting-record', on_start_recording)
+    dispatcher.connect('recorder-starting', on_start_recording)
     # We don't have such thing as a "post-stop" signal, so we have to live with what we do have
-    dispatcher.connect('restart-preview', on_stop_recording)
+    dispatcher.connect('recorder-stopped', on_stop_recording)
 
 
 def post_init(source=None):
@@ -449,7 +449,7 @@ def on_start_recording(elem):
         logger.warn("Error accessing the Visca device %u on recording start. The recording may be incorrect! Error: %s" % (DEFAULT_DEVICE, e))
 
 
-def on_stop_recording(elem):
+def on_stop_recording(elem,elem2):
 
     global logger
 
