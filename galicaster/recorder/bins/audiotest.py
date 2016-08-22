@@ -123,8 +123,8 @@ class GCaudiotest(Gst.Bin, base.Base):
         aux = (pipestr.replace('gc-asink', gcaudiosink)
                .replace("gc-audiotest-enc", self.options["audioencoder"]))
 
-        #bin = Gst.parse_bin_from_description(aux, True)
-        bin = Gst.parse_launch("( {} )".format(aux))
+        bin = Gst.parse_bin_from_description(aux, True)
+        #bin = Gst.parse_launch("( {} )".format(aux))
 
         self.add(bin)
 

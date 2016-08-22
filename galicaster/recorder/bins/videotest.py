@@ -116,8 +116,8 @@ class GCvideotest(Gst.Bin, base.Base):
                       .replace('gc-videotest-enc', self.options['videoencoder'])
                       .replace('gc-videotest-mux', self.options['muxer']))
 
-        #bin = Gst.parse_bin_from_description(aux, False)
-        bin = Gst.parse_launch("( {} )".format(aux))
+        bin = Gst.parse_bin_from_description(aux, False)
+        #bin = Gst.parse_launch("( {} )".format(aux))
         self.add(bin)
 
         self.get_by_name('gc-videotest-sink').set_property('location', path.join(self.options['path'], self.options['file']))
