@@ -442,7 +442,9 @@ def on_start_recording(elem):
     config = context.get_conf().get_section(CONFIG_SECTION) or {}
 
     try:
-        pysca.set_power_on(DEFAULT_DEVICE, True)
+
+        pysca.set_power_on(DEFAULT_DEVICE, True, ) # TODO handler
+
         pysca.recall_memory(DEFAULT_DEVICE, config.get(RECORD_PRESET_KEY, DEFAULT_RECORD_PRESET))
 
     except Exception as e:
