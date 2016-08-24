@@ -11,8 +11,6 @@ from galicaster.core import context
 from galicaster.classui import get_ui_path
 import galicaster.utils.pysca as pysca
 from galicaster.mediapackage import repository
-from galicaster.mediapackage.mediapackage import Mediapackage
-from galicaster.classui.mainwindow import _
 
 # DEFAULTS
 # This is the default Visca device this plugin talks to
@@ -48,7 +46,7 @@ def init():
     dispatcher.connect("init", post_init)
 
     # If port is not defined, a None value will make this method fail
-    pysca.connect(context.get_conf().get(CONFIG_SECTION, PORT_KEY))
+    #pysca.connect(context.get_conf().get(CONFIG_SECTION, PORT_KEY))
 
     dispatcher.connect('recorder-starting', on_start_recording)
     # We don't have such thing as a "post-stop" signal, so we have to live with what we do have
@@ -56,14 +54,7 @@ def init():
 
 
 def post_init(source=None):
-    global recorder_ui, brightscale, movescale, zoomscale, presetbutton, flybutton, builder, onoffbutton, prefbutton, repo
-
-    # TODO MP DOES NOT WORK IF NOT SCHEDULED -> scheduling failed opencast bug
-    # TO TEST !!!!
-    repo = repository.Repository()
-    mp = repo.get_next_mediapackage()
-    print(mp)
-    print (mp.getOCCaptureAgentProperties())
+    global recorder_ui, brightscale, movescale, zoomscale, presetbutton, flybutton, builder, onoffbutton, prefbutton, recorder
 
 
     # Get a shallow copy of this plugin's configuration
@@ -450,20 +441,26 @@ def fly_mode(flybutton):
 
 def on_start_recording(elem):
 
-    global logger
-    mp = repo.get_next_mediapackage()
+    global logger, repo
     # Get a shallow copy of this plugin's configuration
     config = context.get_conf().get_section(CONFIG_SECTION) or {}
 
+    # Get the repository to find all relevant mediapackages
+    #TODO TEST THE OC_PRESET WITH A CAMERA!!!!!
+    repo = repository.Repository()
+    mp = repo.get_next_mediapackage()
+    properties = mp.getOCCaptureAgentProperties()
+    OC_PRESET = int (properties['org.opencastproject.workflow.config.camera-preset'])
+    if OC_PRESET == None:
+        OC_PRESET = config.get(RECORD_PRESET_KEY, DEFAULT_RECORD_PRESET)
     try:
 
         pysca.set_power_on(DEFAULT_DEVICE, True, ) # TODO handler
         onoffbutton.set_active(True)
-        pysca.recall_memory(DEFAULT_DEVICE, config.get(RECORD_PRESET_KEY, DEFAULT_RECORD_PRESET))
+        pysca.recall_memory(DEFAULT_DEVICE, (OC_PRESET))
 
     except Exception as e:
         logger.warn("Error accessing the Visca device %u on recording start. The recording may be incorrect! Error: %s" % (DEFAULT_DEVICE, e))
-
 
 def on_stop_recording(elem,elem2):
 
