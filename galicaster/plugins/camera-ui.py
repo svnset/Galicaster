@@ -1,6 +1,7 @@
 # Galicaster-Plugin
 
-
+import os
+import json
 import gi
 
 gi.require_version("Gtk", "3.0")
@@ -9,6 +10,8 @@ from gi.repository import Gtk, GObject, Gdk
 from galicaster.core import context
 from galicaster.classui import get_ui_path
 import galicaster.utils.pysca as pysca
+from galicaster.mediapackage import repository
+from galicaster.mediapackage.mediapackage import Mediapackage
 from galicaster.classui.mainwindow import _
 
 # DEFAULTS
@@ -33,6 +36,9 @@ RECORD_PRESET_KEY = 'record-preset'
 # This is the key containing the preset to set the camera to just after switching it off
 IDLE_PRESET_KEY= 'idle-preset'
 
+#PRESET TO USE WITH OPENCAST
+WORKFLOW_PRESET = "preset"
+
 
 def init():
     global recorder, dispatcher
@@ -50,7 +56,15 @@ def init():
 
 
 def post_init(source=None):
-    global recorder_ui, brightscale, movescale, zoomscale, presetbutton, flybutton, builder, onoffbutton, prefbutton
+    global recorder_ui, brightscale, movescale, zoomscale, presetbutton, flybutton, builder, onoffbutton, prefbutton, repo
+
+    # TODO MP DOES NOT WORK IF NOT SCHEDULED -> scheduling failed opencast bug
+    # TO TEST !!!!
+    repo = repository.Repository()
+    mp = repo.get_next_mediapackage()
+    print(mp)
+    print (mp.getOCCaptureAgentProperties())
+
 
     # Get a shallow copy of this plugin's configuration
     conf = context.get_conf().get_section(CONFIG_SECTION) or {}
@@ -437,14 +451,14 @@ def fly_mode(flybutton):
 def on_start_recording(elem):
 
     global logger
-
+    mp = repo.get_next_mediapackage()
     # Get a shallow copy of this plugin's configuration
     config = context.get_conf().get_section(CONFIG_SECTION) or {}
 
     try:
 
         pysca.set_power_on(DEFAULT_DEVICE, True, ) # TODO handler
-
+        onoffbutton.set_active(True)
         pysca.recall_memory(DEFAULT_DEVICE, config.get(RECORD_PRESET_KEY, DEFAULT_RECORD_PRESET))
 
     except Exception as e:
@@ -461,5 +475,6 @@ def on_stop_recording(elem,elem2):
     try:
         pysca.recall_memory(DEFAULT_DEVICE, config.get(IDLE_PRESET_KEY, DEFAULT_IDLE_PRESET))
         pysca.set_power_on(DEFAULT_DEVICE, False)
+        onoffbutton.set_active(False)
     except Exception as e:
         logger.warn("Error accessing the Visca device %u on recording end. The recording may be incorrect! Error: %s" % (DEFAULT_DEVICE, e))
