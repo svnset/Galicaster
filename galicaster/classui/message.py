@@ -17,7 +17,7 @@ from galicaster.classui import get_image_path, get_ui_path
 from galicaster.classui.elements.message_header import Header
 
 from galicaster.utils.i18n import _
-from galicaster.core import context
+from galicaster.core import context 
 
 TEXT = {'title': None, 'main': None, 'text': None}
 
@@ -30,6 +30,8 @@ WARN_OK = 'okwarning.glade'
 OPERATIONS = 'operations.glade'
 ABOUT = 'about.glade'
 LOCKSCREEN = 'lockscreen.glade'
+MP_INFO = 'info.glade'
+NEXT_REC = 'next.glade'
 
 # FIXME
 QUESTION = Gtk.STOCK_DIALOG_QUESTION
@@ -43,7 +45,7 @@ OPERATION_NAMES = { 'Export to Zip': _('Export to Zip'),
             'Cancel Export to Zip Nightly': _('Cancel Zip Nightly'),
             'Ingest': _('Ingest'),
             'Ingest Nightly': _('Ingest Nightly'),
-            'Cancel Ingest Nightly': _('Cancel Ingest Nightly:'),
+            'Cancel Ingest Nightly': _('Cancel Ingest Nightly'),
             'Side by Side': _('Side by Side'),
             'Side by Side Nightly': _('Side by Side Nightly'),
             'Cancel Side by Side Nightly': _('Cancel SbS Nightly'),
@@ -57,15 +59,19 @@ class PopUp(Gtk.Widget):
     __gtype_name__ = 'PopUp'
 
     def __init__(self, message=None, text=TEXT, parent=None,
-                 buttons=None, response_action=None, close_on_response=True):
+                 buttons=None, response_action=None, close_on_response=True,show=[],close_parent = False):
         """ Initializes the Gtk.Dialog from its GLADE
         Args:
             message (str): type of message (See above constants)
-            text (Dict{str:str}): dictionary with three fields (title, main question, explanation text)
+            text (Dict{str:str}): dictionary with the labels of the text that are going to be ser.
             parent (Gtk.Window): program main window
             buttons (Dict{str:str}): button labels to be shown and its responses
+
+        Notes: title key is asociated with the label of the GALICASTER strip.
+                Any other key must be the same as the label id in the Glade.
+
         """
-        # FIXME: Workaround in order to avoid the gurbage collector (GC)
+        # FIXME: Workaround in order to avoid the garbage collector (GC)
         global instance
         instance = self
 
@@ -76,6 +82,7 @@ class PopUp(Gtk.Widget):
         self.response_action = response_action
         self.close_on_response = close_on_response
         self.message = message
+        self.close_parent = close_parent
         self.size = size
         self.wprop = size[0]/1920.0
         self.hprop = size[1]/1080.0
@@ -84,8 +91,10 @@ class PopUp(Gtk.Widget):
         self.gui = Gtk.Builder()
         self.gui.add_from_file(get_ui_path(message))
         self.gui.connect_signals(self)
+
         self.dialog = self.configure_ui(text, message, self.gui, parent)
 
+        # Specific glade modifications
         if message == OPERATIONS:
 
             frames = {'Cancel': {'Cancel' : -2}}
@@ -102,13 +111,39 @@ class PopUp(Gtk.Widget):
 
             self.set_buttons(self.gui, frames)
 
+        elif message == MP_INFO:
+            if text.has_key('tracks'):
+                grid = self.gui.get_object('tracks_grid')
+                if grid:
+                    self.fill_info(grid, text['tracks'])
+            if text.has_key('catalogs'):
+                grid = self.gui.get_object('catalogs_grid')
+                if grid:
+                    self.fill_info(grid, text['catalogs'])
+
         elif message == ABOUT:
             self.set_logos(self.gui)
 
+        elif message == NEXT_REC:
+            if text['next_recs']:
+                self.fill_mp_info(self.gui, text['next_recs'])
+            else:
+                no_recs = self.gui.get_object('no_recordings')
+                if no_recs:
+                    no_recs.show()
+        
+        elif message == LOCKSCREEN:
+            for element in show:
+                gtk_obj = self.gui.get_object(element)
+                if gtk_obj:
+                    gtk_obj.show()
+            self.gui.get_object("quitbutton").connect("clicked",context.get_mainwindow().do_quit)
+
         # Display dialog
         parent.get_style_context().add_class('shaded')
-        if message == ERROR or message == WARN_QUIT or message == WARN_STOP or message == ABOUT or message == INFO or message == WARN_DELETE or message == LOCKSCREEN:
-            self.dialog.show_all()
+        self.dialog.set_transient_for(parent)
+        if message in [ERROR, WARN_QUIT, WARN_STOP, ABOUT, INFO, WARN_DELETE, LOCKSCREEN, MP_INFO]:
+            self.dialog.show()
             self.dialog.connect('response', self.on_dialog_response)
         #elif message == ABOUT:
         #    #TODO: use on_dialog_response instead of on_about_dialog_response
@@ -124,7 +159,7 @@ class PopUp(Gtk.Widget):
     def configure_ui(self, text, message_type, gui, parent, another=None):
         """Imports the dialog from the corresponding GLADE and adds some configuration
         Args:
-            text (Dict{Str:str}): a dictionary wit the text to be filled
+            text (Dict{Str:str}): a dictionary with the text to be filled
             message_type (str): one of the above constants that leads to the appropriate GLADE
             gui (Gtk.Builder): the builder with the GLADE info
             parent (Gtk.Window): the Main Window of the application
@@ -137,30 +172,47 @@ class PopUp(Gtk.Widget):
         if image:
             image.set_pixel_size(int(self.wprop*80))
 
-        if message_type != INFO:
-            main = gui.get_object("main")
-            if main:
-                main.set_label(text.get('main',''))
-        elif message_type == INFO:
-            # TODO: Overwrite info text if given
-            help_message = "{}\n{}".format(text.get('main',''),text.get('text',''))
-            textbuffer = gui.get_object('textbuffer')
-            textbuffer.set_text(help_message)
+        title = 'Galicaster'
+
+        # For MP Info PopUP
+        series_shown = False
+
+        for label,content in text.iteritems():
+
+            if label == 'title':
+                title = content
+
+            elif label == 'main':
+                if message_type != INFO:
+                    main = gui.get_object("main")
+                    if main:
+                        main.set_label(text.get('main',''))
+                else:
+                    help_message = "{}\n{}".format(text.get('main',''),text.get('text',''))
+                    textbuffer = gui.get_object('textbuffer')
+                    textbuffer.set_text(help_message)
+
+            elif isinstance(label,str) and content:
+                text_label = gui.get_object(label)
+                if text_label:
+                    text_label.set_label(content)
+                    text_label.show()
+                title_label = gui.get_object('{}_label'.format(label))
+                if title_label:
+                    title_label.show()
+                if label.find('series')>=0 and not series_shown:
+                    series_frame = gui.get_object('series_frame')
+                    series_frame.show()
+                    series_shown = True
 
         dialog = gui.get_object("dialog")
-
-        text_label = gui.get_object('text')
-        if text_label:
-            text_label.set_label(text.get('text',''))
-            text_label.show()
-
 
         dialog.set_type_hint(Gdk.WindowTypeHint.TOOLBAR)
         dialog.set_skip_taskbar_hint(True)
         dialog.set_keep_above(False)
 
         #HEADER
-        strip = Header(size=self.size, title=text.get("title","Galicaster"))
+        strip = Header(size=self.size, title=title)
         dialog.vbox.pack_start(strip, True, True, 0)
         dialog.vbox.reorder_child(strip,0)
 
@@ -191,14 +243,46 @@ class PopUp(Gtk.Widget):
                                 the buttons to be shown and its response code.
             gui (Gtk.Builder): the structure imported from glade
         """
+        grid = gui.get_object('operations grid')
+        # the different widgets positioned on frame export
+        # FIXME: extensible to grids with different sizes (2x2)
+        # Problem getting the width and height of the grid, non readable porperty
+        export_frame_pos = {
+            0 : { # column number
+                0 : None, # row number
+                1 : None,
+                },
+            1 : {
+                0 : None,
+                1 : None,
+                }
+        }
+
         for frame,operations in frames.iteritems():
-            frame = gui.get_object('{} frame'.format(frame))
-            frame.show()
+            frame_widget = gui.get_object('{} frame'.format(frame))
+            frame_widget.show()
             for operation,response in operations.iteritems():
                 button = gui.get_object("{} button".format(operation))
                 button.set_label(OPERATION_NAMES[operation])
                 button.connect("clicked",self.force_response,response)
+                # Fill the export_frame_pos dict in order to expand the buttons if
+                # necessary to achive a better look & feel
+                if frame == 'Export':
+                    row = grid.child_get_property(button,'left-attach')
+                    column = grid.child_get_property(button,'top-attach')
+                    export_frame_pos[column][row] = button
                 button.show()
+
+        # Expand the buttons if the widgets of the same column in different rows are hidden
+        for row,widget in export_frame_pos[0].iteritems():
+            if not widget:
+                if export_frame_pos[1][row]:
+                    grid.child_set_property(export_frame_pos[1][row],'top-attach',0)
+                    grid.child_set_property(export_frame_pos[1][row],'height',len(export_frame_pos))
+            else:
+                if not export_frame_pos[1][row]:
+                    grid.child_set_property(export_frame_pos[0][row],'height',len(export_frame_pos))
+
 
     def set_logos(self,gui):
         """ Set the logos of the product and the company
@@ -218,6 +302,71 @@ class PopUp(Gtk.Widget):
             int(pixbuf.get_height()*self.wprop),
             GdkPixbuf.InterpType.BILINEAR)
         teltek_logo.set_from_pixbuf(pixbuf)
+
+    def fill_info(self,grid,info):
+        """ Fill the Information PopUp with the tracks information
+        Args:
+            grid (Gtk.Grid): the grid element of 2 columns to be filled.
+            info (Dict): the tracks of the MP and its information as value.
+        """
+        row = 0
+        for e in info:
+            void_label = Gtk.Label('')
+            void_label.show()
+            grid.attach(void_label,0,row,1,1)
+            void_label = Gtk.Label('')
+            void_label.show()
+            grid.attach(void_label,1,row,1,1)
+            row += 1
+            for info_label, info_content in e.iteritems():
+                label = Gtk.Label.new(info_label.title())
+                label.set_halign(Gtk.Align.END)
+                label.show()
+                content = Gtk.Label.new(info_content.title())
+                content.set_halign(Gtk.Align.START)
+                content.show()
+                grid.attach(label,0,row,1,1)
+                grid.attach(content,1,row,1,1)
+                row += 1
+        grid.show()
+
+    def fill_mp_info(self, gui, info):
+        """ Fill next recordings PopUp grid with the MP information
+        """
+        # FIXME: Merge fill info and fill mp info in any way?
+        # Make a generic function in order to fill grids with dynamic widgets information
+        grid = gui.get_object('mp_grid')
+        row = 1
+        for mp in info:
+            column = 0
+            for label, content in mp.iteritems():
+                widget = gui.get_object('{}_mp'.format(label))
+                if widget:
+                    if isinstance(widget, Gtk.Label):
+                        new_widget = Gtk.Label().new(content)
+                    else:
+                        new_widget = Gtk.Button().new_with_label(_("Record Now"))
+                        # FIXME: Use set_properties?
+                        new_widget.set_property('halign', widget.get_property('halign'))
+                        new_widget.set_property('valign', widget.get_property('valign'))
+                        new_widget.connect("clicked",self.send_start, content)
+                    widget_classes = widget.get_style_context().list_classes()
+                    for style_class in widget_classes:
+                        widget_style_context = new_widget.get_style_context()
+                        widget_style_context.add_class(style_class)
+                    new_widget.show()
+
+                grid.attach(new_widget,column,row,1,1)
+                column += 1
+            row += 1
+
+    # FIXME: so specific, give it as a callback?
+    def send_start(self,origin, data):
+        mp = context.get_repository().get(data)
+        mp.anticipated = True
+        context.get_recorder().record(mp)
+        self.dialog.destroy()
+        return True
 
 
     def resize_buttons(self, area, fontsize, equal = False):
@@ -253,7 +402,8 @@ class PopUp(Gtk.Widget):
 
 
     def force_response(self, origin=None, response=None):
-        self.dialog.response(response)
+        if response:
+            self.dialog.response(response)
 
     def on_about_dialog_response(self, origin, response_id):
         if response_id in NEGATIVE:
@@ -263,9 +413,13 @@ class PopUp(Gtk.Widget):
     def on_dialog_response(self, origin, response_id):        
         if response_id not in NEGATIVE and self.response_action:            
             self.response_action(response_id, builder=self.gui, popup=self)
-            
-        if self.close_on_response:
+            if self.close_on_response:
+                self.dialog_destroy()
+        else:
             self.dialog_destroy()
+            if self.close_parent:
+                GObject.idle_add(context.get_mainwindow().do_quit)
+
 
     def dialog_destroy(self, origin=None):
         global instance
@@ -274,12 +428,6 @@ class PopUp(Gtk.Widget):
             self.dialog.destroy()
             self.dialog = None
         instance = None
-
-    def error_reload_profile(self, origin=None):        
-        self.dialog_destroy()
-
-        dispatcher = context.get_dispatcher()
-        dispatcher.emit('action-reload-profile')
 
 
 GObject.type_register(PopUp)

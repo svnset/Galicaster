@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import serial
-import sys
+#import sys
 import os
 import select
 import threading
@@ -27,7 +27,8 @@ import Queue
 
 # Timeout for read and write, in seconds
 # TODO: More timeouts?
-DEFAULT_TIMEOUT=30
+PORT_TIMEOUT = 5
+RESPONSE_TIMEOUT = 30
 
 # This is the default "offset" for the 'set address' command.
 # According to the H-100 documentation, it is always one.
@@ -62,6 +63,7 @@ VISCA_INQUIRY=0x09
 VISCA_CATEGORY_INTERFACE=0x00
 VISCA_CATEGORY_CAMERA=0x04
 VISCA_CATEGORY_PAN_TILTER=0x06
+VISCA_CATEGORY_DISPLAY=0x7e
 
 VISCA_ADDR=0x30
 VISCA_ADDR_SET=0x30
@@ -241,6 +243,8 @@ VISCA_PT_LIMITSET_SET_DL=0x00
 H_NIBBLE_MASK=0xF0
 L_NIBBLE_MASK=0x0F
 
+VISCA_INFO_DISPLAY=0x18
+VISCA_INFO_DISPLAY_OFF=0x03
 
 # EXCEPTIONS
 class ViscaError(RuntimeError):
@@ -308,7 +312,7 @@ class Packet(bytes):
 
                 if len(self) < VISCA_MIN_PKG_LEN or \
                    len(self) > VISCA_MAX_PKG_LEN:
-                        raise ValueError("Incorrect packet size")
+                        raise ValueError("Incorrect packet size for '{0}': {1}".format(self, len(self)))
 
                 if ord(self[-1]) != VISCA_TERMINATOR:
                         raise ValueError("Incorrect terminator byte")
@@ -333,13 +337,18 @@ class Packet(bytes):
                 packet=serial.to_bytes([])
 
                 for count in xrange(VISCA_MAX_PKG_LEN):
-                        # Break if there are not bytes to read
-                        if port.inWaiting() == 0:
+                        # Read a new byte
+                        new_byte = port.read(1)
+
+                        # If it is empty, read has returned for timeout
+                        if len(new_byte) == 0:
                                 break
 
-                        packet = packet + port.read(1)
+                        # Otherwise, append the read byte to the packet contents
+                        packet = packet + new_byte
 
-                        if ord(packet[-1]) == VISCA_TERMINATOR:
+                        # Check whether we received a terminator
+                        if ord(new_byte) == VISCA_TERMINATOR:
                                 break
 
                 # The error handling (packet size, packet terminator, etc.) is done on the constructor
@@ -519,7 +528,7 @@ class Socket(object):
                         # If the packet is not set here, the command was cancelled before an answer could be received
                         # Or the wait() exited for timeout
                         if self.__packet is None:
-                                raise ViscaTimeoutError()
+                                raise ViscaTimeoutError("Timeout waiting for a response")
                         # Return the packet, but set it to None afterwards
                         try:
                                 return self.__packet
@@ -694,7 +703,7 @@ def __reader():
                         elif ord(p[1]) == VISCA_ADDR_CHANGE:
                                 #print "__READER: Received network change packet!!!"
                                 # Read responses in a new thread
-                                threading.Thread(target=cmd_address_set()).start()
+                                threading.Thread(target=cmd_address_set()).start() # noqa: ignore=F821
                         else:
                                 # Make the reception of the packet in the corresponding device
                                 # Responses with a sender of "0" are broadcast requests, but are duly handled by the device 0
@@ -741,7 +750,7 @@ def __bcast_reader():
                                         # TODO: Any other measures?
                                         print "WARNING: Received 'SET_ADDR' package for existing device {}".format(new_addr)
                                 # Signal the reception
-                                __init_addresses_rcvd = True
+                                __init_addresses_rcvd = True # noqa: ignore=F841
                                 __init_addresses_lock.notify()
                 else:
                         # TODO: Use logger
@@ -772,7 +781,7 @@ def __get_response(device, socket = 0):
                 # Read the response
                 return __devices[device].get_response(socket)
         except KeyError:
-                raise ViscaNoSuchDeviceError("Tried to receive a packet from the non-existant device {}".format(recipient))
+                raise ViscaNoSuchDeviceError("Tried to receive a packet from the non-existant device {}".format(recipient)) # noqa: ignore=F821
 
 
 def __send(recipient, *payload):
@@ -805,7 +814,7 @@ def __send(recipient, *payload):
                         response.parse_error()
 
                         # Reach this if the previous function didn't raise a "standard" exception
-                        raise ViscaUnexpectedResponseError("Received response {}. 'completed' expected".format(reply))
+                        raise ViscaUnexpectedResponseError("Received response {}. 'completed' expected".format(reply)) # noqa: ignore=F841
 
         except KeyError:
                 raise ViscaNoSuchDeviceError("Tried to send a packet to the non-existant device {}".format(recipient))
@@ -846,7 +855,7 @@ def connect(portname, timeout=None):
         global __alive
 
         # Initialize __timeout
-        __timeout = timeout if timeout else DEFAULT_TIMEOUT
+        __timeout = timeout if timeout else RESPONSE_TIMEOUT
 
         with __port_available:
                 if (__serialport == None):
@@ -854,7 +863,7 @@ def connect(portname, timeout=None):
                                 # Initialize port
                                 __serialport = serial.Serial(portname,\
                                                              VISCA_BAUD_RATE,\
-                                                             timeout=__timeout,\
+                                                             timeout=PORT_TIMEOUT,\
                                                              stopbits=VISCA_STOPBITS,\
                                                              bytesize=VISCA_BYTESIZE)
                                 __serialport.flushInput()
@@ -919,8 +928,8 @@ def init_addresses(first=DEFAULT_SET_ADDR_OFFSET):
 
                 # Wait for the responses to arrive.
                 # The packets are handled by the broadcast receiving loop, but we keep track of the packets received
-                # so that the method does not return until we wait for self.__timeout seconds for a new response.
-                # We assume that if a new packet takes more than self.__timeout seconds to arrive, then no more packets
+                # so that the method does not return until we wait for __timeout seconds for a new response.
+                # We assume that if a new packet takes more than __timeout  seconds to arrive, then no more packets
                 # will arrive, so we return
                 # Even after that, should a new 'set address' packet be received, it would be processed anyway
                 while not __init_addresses_rcvd:
@@ -958,7 +967,7 @@ def clear_all():
                         __if_clear_rcvd = False
 
                 # Send command
-                resp = __write_to_serial(Packet.from_parts(0, VISCA_BCAST_ADDR, VISCA_IF_CLEAR_PAYLOAD))
+                resp = __write_to_serial(Packet.from_parts(0, VISCA_BCAST_ADDR, VISCA_IF_CLEAR_PAYLOAD)) # noqa: ignore=F841
 
                 # Wait for a response
                 # TODO: Use longer timeout?
@@ -983,12 +992,12 @@ def clear_commands(dest):
                 clear_all()
         else:
                 __send(dest, VISCA_IF_CLEAR_PAYLOAD)
-                try:
-                        __devices[i].clear()
-                except KeyError:
-                        # Ignore. This command may be send on initialization, when
-                        # the different 'Device' instances are not yet created
-                        pass
+                # try:
+                #         __devices[i].clear()
+                # except KeyError:
+                #         # Ignore. This command may be send on initialization, when
+                #         # the different 'Device' instances are not yet created
+                #         pass
 
 
 def __cmd_cam(device, *parts):
@@ -996,6 +1005,9 @@ def __cmd_cam(device, *parts):
 
 def __cmd_pt(device, *parts):
         __send(device, VISCA_COMMAND, VISCA_CATEGORY_PAN_TILTER, *parts)
+
+def __cmd_dis(device, *parts):
+        __send(device, VISCA_COMMAND, VISCA_CATEGORY_DISPLAY, *parts)
 
 
 # POWER control
@@ -1111,8 +1123,8 @@ def focus(device, action, speed=None, zoom=None):
 
         # Mechanism to convert the actions accepted by the 'zoom' command into Visca codes
         actions2codes = { FOCUS_ACTION_STOP: lambda speed: VISCA_FOCUS_STOP,
-                          FOCUS_ACTION_NEAR: lambda speed: VISCA_FOCUS_NEAR if speed is None else VISCA_FOCUS_NEAR_SPEED | speed,
-                          FOCUS_ACTION_FAR: lambda speed: VISCA_FOCUS_FAR if speed is None else VISCA_FOCUS_FAR_SPEED | speed }
+                          FOCUS_ACTION_NEAR: lambda speed: VISCA_FOCUS_NEAR if speed is None else VISCA_FOCUS_NEAR_SPEED | speed, # noqa: ignore=F821
+                          FOCUS_ACTION_FAR: lambda speed: VISCA_FOCUS_FAR if speed is None else VISCA_FOCUS_FAR_SPEED | speed } # noqa: ignore=F821
 
         if action == FOCUS_ACTION_NEAR or action == FOCUS_ACTION_FAR:
                 # Be flexible about the values that can be passed to 'speed',
@@ -1226,7 +1238,7 @@ def set_autofocus_active_interval(device, active, interval):
         These parameters are relevant for some autofocus modes.
         Both parameters have to be integers between 0x00 and 0xFF
         """
-        __cmd_cam(device, VISCA_FOCUS_AUTO_ACTIVE_INT, Packet.int_to_bytes(active,2), Packet.int_to_bytes(interval,2))
+        __cmd_cam(device, VISCA_FOCUS_AUTO_ACTIVE_INT, Packet.int_to_bytes(active,2), Packet.int_to_bytes(interval,2)) # noqa: ignore=F821
 
 
 def set_ir_correction(device, activate):
@@ -1314,18 +1326,6 @@ def set_brightness(device, action):
                         __cmd_cam(device, VISCA_BRIGHT, VISCA_BRIGHT_UP)
                 elif action == BRIGHT_ACTION_DOWN:
                         __cmd_cam(device, VISCA_BRIGHT, VISCA_BRIGHT_DOWN)
-                else:
-                        try:
-                                action = int(action)
-                                if action < 0:
-                                        action = 0
-                                if action > 0x1F:
-                                        action = 0x1F
-
-                                __cmd_cam(device, VISCA_BRIGHT_VALUE, Packet.int_to_bytes(action, 4))
-                        except ValueError as e:
-                                raise ValueError("Expected integer, got {0}".format(action))
-
 
         except ValueError as e:
                         e.message = "The string {0} or {1} must be passed " \
@@ -1496,3 +1496,10 @@ def pan_tilt_reset(device):
         Force the device to recalibrate the pan-tilt position.
         """
         __cmd_pt(device, VISCA_PT_RESET)
+
+
+def osd_off(device):
+        """
+        Remove OSD info in display
+        """
+        __cmd_dis(device, VISCA_COMMAND, VISCA_INFO_DISPLAY, VISCA_INFO_DISPLAY_OFF)

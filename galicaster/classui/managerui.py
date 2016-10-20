@@ -16,16 +16,20 @@ UI for the Media Manager and Player area
 
 from gi.repository import Gtk
 from gi.repository import GObject
-from galicaster.utils import series
 
 from galicaster.core import context
 from galicaster.mediapackage import mediapackage
+from galicaster.mediapackage.serializer import set_manifest_json
 from galicaster.classui import message
 from galicaster.classui.metadata import MetadataClass as Metadata
 from galicaster.classui.strip import StripUI
-from galicaster.classui.mpinfo import MPinfo
 
 from galicaster.utils.i18n import _
+from galicaster.utils import readable
+from galicaster.utils.nautilus import open_folder
+from galicaster.utils.resize import resize_button
+
+from os import path
 
 logger = context.get_logger()
 
@@ -52,13 +56,11 @@ class ManagerUI(Gtk.Box):
         Gtk.Box.__init__(self)
         self.strip = StripUI(element)
 
-	self.conf = context.get_conf()
-	self.dispatcher = context.get_dispatcher()
-	self.repository = context.get_repository()
-	self.network = False
-
-	self.dispatcher.connect_ui("opencast-connected", self.network_status, True)
-	self.dispatcher.connect_ui("opencast-unreachable", self.network_status, False)
+        self.conf = context.get_conf()
+        self.dispatcher = context.get_dispatcher()
+        self.repository = context.get_repository()
+        self.network = False
+        self.dispatcher.connect_ui("opencast-status", self.network_status)
 
 
     def sorting(self, treemodel, iter1, iter2, data, regular=True, ascending=1):
@@ -110,7 +112,7 @@ class ManagerUI(Gtk.Box):
             else:
                 return -1
 
-	    # Regular sorting
+            # Regular sorting
         if first > second:
             return 1 * ascending
         elif first == second:
@@ -146,7 +148,7 @@ class ManagerUI(Gtk.Box):
             else:
                 return -1
 
-	    # Regular sorting
+            # Regular sorting
         if first > second:
             return 1 * ascending
         elif first == second:
@@ -190,9 +192,9 @@ class ManagerUI(Gtk.Box):
         for job in day:
             op_state = package.operation[job.lower().replace(" ", "")]
             if op_state == mediapackage.OP_DONE:
-                text['text']=text['text'] + "\n" + _("{0} already performed").format(OPERATION_NAMES[job])
+                text['text']=text['text'] + "\n" + _("{0} already performed").format(OPERATION_NAMES.get(job, job))
             elif op_state == mediapackage.OP_NIGHTLY:
-                text['text']=text['text'] + "\n" + _("{0} will be performed tonight").format(OPERATION_NAMES[job])
+                text['text']=text['text'] + "\n" + _("{0} will be performed tonight").format(OPERATION_NAMES.get(job, job))
 
 
         response_list = ['Ingest', # Resp 1
@@ -220,8 +222,8 @@ class ManagerUI(Gtk.Box):
             operations_dialog.response == Gtk.ResponseType.OK:
             return True
 
-        elif 0 < operations_dialog.response < len(response_list):
-            chosen_job = response_list[operations_dialog.response-1].lower().replace (" ", "_")
+        elif 0 < operations_dialog.response <= len(response_list):
+            chosen_job = response_list[operations_dialog.response-1].lower().replace (" ", "")
             if chosen_job.count('nightly'):
                 context.get_worker().do_job_nightly(chosen_job.replace("_",""), package)
             else:
@@ -238,75 +240,130 @@ class ManagerUI(Gtk.Box):
 
     def edit(self,key):
         """Pop ups the Metadata Editor"""
-	logger.info("Edit: {0}".format(str(key)))
-	selected_mp = self.repository.get(key)
-	Metadata(selected_mp, series.get_series())
-	self.repository.update(selected_mp)
+        logger.info("Edit: {0}".format(str(key)))
+        selected_mp = self.repository.get(key)
+        Metadata(selected_mp)
+        self.repository.update(selected_mp)
 
     def info(self,key):
         """Pops up de MP info dialog"""
         logger.info("Info: {0}".format(str(key)))
-        MPinfo(key)
+        text = self.get_mp_info(key)
+        text['title'] = 'Mediapackage Info'
+        message.PopUp(message.MP_INFO, text,
+                      context.get_mainwindow(),
+                      response_action=self.create_mp_info_response(text['folder']),
+                      close_on_response=False)
+
+
+    def create_mp_info_response(self, folder):
+        def on_mp_info_response(response_id, **kwargs):
+            """ Opens the MP folder """
+            open_folder(folder)
+
+        return on_mp_info_response
+
+    def get_mp_info(self,key):
+        """ Retrieves a dictionary with the information of the MP
+        with the given key
+
+        Args:
+            key (str): the MP identifier
+
+        Returns:
+            Dict {}: with the label of the info.glade dialog as key
+                    and the content of the label as values.
+        """
+        mp = self.repository.get(key)
+
+        data = set_manifest_json(mp)
+
+        # General
+        data['title_mp'] = data['title']
+        del data['title']
+
+        data['duration'] = readable.time((data['duration'])/1000)
+        data['size'] = readable.size(data['size'])
+        data['created'] = readable.date(mp.getStartDateAsString(),
+                                   "%B %d, %Y - %H:%M").replace(' 0',' ')
+
+        if data.has_key('seriestitle'):
+            data['isPartOf'] = data['seriestitle']
+
+        # Operations
+        for op,status in data['operations'].iteritems():
+            data[op] = mediapackage.op_status[status]
+        del data['operations']
+
+        # Tracks
+        tracks = []
+        for track in data['media']['track']:
+            t = {}
+            t[_('Name:')] = track['id']
+            t[_('Type:')] = track['mimetype']
+            t[_('Flavor:')] = track['type']
+            t[_('File:')] = path.split(track['url'])[1]
+            tracks.append(t)
+        if tracks:
+            data['tracks'] = tracks
+            del data['media']
+
+        # Catalogs
+        catalogs = []
+        for catalog in data['metadata']['catalog']:
+            c = {}
+            c[_('Name:')] = catalog['id']
+            c[_('Flavor:')] = catalog['type']
+            c[_('Type:')] = catalog['mimetype']
+            catalogs.append(c)
+        if catalogs:
+            data['catalogs'] = catalogs
+            del data['metadata']
+
+        return data
 
     def do_resize(self, buttonlist, secondlist=[]):
         """Force a resize on the Media Manager"""
         size = context.get_mainwindow().get_size()
         self.strip.resize()
-	altura = size[1]
-	anchura = size[0]
+        altura = size[1]
+        anchura = size[0]
 
-	k1 = anchura / 1920.0
-	k2 = altura / 1080.0
-	self.proportion = k1
+        k1 = anchura / 1920.0
+        k2 = altura / 1080.0
+        self.proportion = k1
 
-	for name in buttonlist:
-	    button = self.gui.get_object(name)
-	    button.set_property("width-request", int(k1*100) )
-	    button.set_property("height-request", int(k1*100) )
+        for name in buttonlist:
+            button = self.gui.get_object(name)
+            button.set_property("width-request", int(k1*100) )
+            button.set_property("height-request", int(k1*100) )
 
-	    image = button.get_children()
-	    if type(image[0]) == Gtk.Image:
-		image[0].set_pixel_size(int(k1*80))
+            resize_button(button,size_image=k1*80,size_vbox=k1*46)
 
-	    elif type(image[0]) == Gtk.VBox:
-		for element in image[0].get_children():
-		    if type(element) == Gtk.Image:
-			element.set_pixel_size(int(k1*46))
+        for name in secondlist:
+            button2 = self.gui.get_object(name)
+            button2.set_property("width-request", int(k2*85) )
+            button2.set_property("height-request", int(k2*85) )
 
-	for name in secondlist:
-	    button2 = self.gui.get_object(name)
-	    button2.set_property("width-request", int(k2*85) )
-	    button2.set_property("height-request", int(k2*85) )
+            resize_button(button2.get_children()[0],size_image=k1*56,size_vbox=k1*46)
 
-	    image = button2.get_children()[0].get_children()
-	    if type(image[0]) == Gtk.Image:
-		image[0].set_pixel_size(int(k1*56))
-                image[0].show()
-
-	    elif type(image[0]) == Gtk.VBox:
-		for element in image[0].get_children():
-		    if type(element) == Gtk.Image:
-			element.set_pixel_size(int(k1*46))
-
-	return True
+        return True
 
     def delete(self,key, response=None):
         """Pops up a dialog. If response is positive, deletes a MP."""
         self.selected = key
-	package = self.repository.get(key)
-	logger.info("Delete: {0}".format(str(key)))
-	t1 = _("This action will remove the recording from the hard disk.")
-	t2 = _('Recording: "{0}"').format(package.getTitle())
-	text = {"title" : _("Media Manager"),
-		"main" : _("Are you sure you want to delete?"),
-		"text" : t1+"\n\n"+t2
-		    }
-	buttons = ( Gtk.STOCK_DELETE, Gtk.ResponseType.OK, Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT)
-	message.PopUp(message.WARN_DELETE, text,
+        package = self.repository.get(key)
+        logger.info("Delete: {0}".format(str(key)))
+        t1 = _("This action will remove the recording from the hard disk.")
+        t2 = _('Recording: "{0}"').format(package.getTitle())
+        text = {"title" : _("Media Manager"),
+                "main" : _("Are you sure you want to delete?"),
+                "text" : t1+"\n\n"+t2
+                    }
+        buttons = ( Gtk.STOCK_DELETE, Gtk.ResponseType.OK, Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT)
+        message.PopUp(message.WARN_DELETE, text,
                       context.get_mainwindow(),
                       buttons, response)
-
-
 
     def network_status(self, signal, status):
         """Updates the signal status from a received signal"""

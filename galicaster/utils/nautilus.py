@@ -11,12 +11,13 @@
 # or send a letter to Creative Commons, 171 Second Street, Suite 300,
 # San Francisco, California, 94105, USA.
 
-import os
 
 from galicaster.core import context
+from galicaster.utils.systemcalls import execute
 
 logger = context.get_logger()
 
 def open_folder(path):
     logger.info("Opening folder {0}".format(path))
-    os.system("nohup xdg-open {} >/dev/null 2>&1 &".format(path))
+    return_code = execute(['xdg-open', '{}'.format(path)], logger)
+    return return_code

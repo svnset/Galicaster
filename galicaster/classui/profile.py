@@ -54,7 +54,7 @@ class ProfileUI(Gtk.Window):
         size = context.get_mainwindow().get_size()
         width = int(size[0]/2.2)
         height = int(size[1]/2.0)
-        Gtk.Window.__init__(self)
+        Gtk.Window.__init__(self, type=Gtk.WindowType.POPUP)
         self.set_transient_for(parent)
         self.set_destroy_with_parent(True)
         self.set_type_hint(Gdk.WindowTypeHint.TOOLBAR)
@@ -64,6 +64,7 @@ class ProfileUI(Gtk.Window):
         self.set_skip_taskbar_hint(True)
         self.set_modal(True)
         self.set_keep_above(False)
+        self.parent = parent
 
         strip = Header(size=size,title=_("Profile Selector"))
 
@@ -81,6 +82,7 @@ class ProfileUI(Gtk.Window):
 
         tab1 = Gtk.Label(label=_("Profile Selector"))
         self.append_tab(self.list,tab1)
+        parent.get_style_context().add_class('shaded')
         self.show_all()
         self.present()
 
@@ -114,6 +116,7 @@ class ProfileUI(Gtk.Window):
             self.profile.destroy()
         if self.track:
             self.track.destroy()
+        self.parent.get_style_context().remove_class('shaded')
         self.destroy()
 
 class ProfileDialog(Gtk.HBox):
@@ -300,8 +303,8 @@ class ListProfileBox(ProfileDialog):
         view.columns_autosize()
 
         render = Gtk.CellRendererText()
-        #render.set_property('width-chars',25)
-        render.set_property('xalign',0.5)
+        render.set_property('width-chars', 300)
+        render.set_property('xalign', 0)
         #render.set_property('height', 40)
         font = Pango.FontDescription("bold "+str(int(self.hprop*20)))
         render.set_property('font-desc', font)
@@ -311,6 +314,7 @@ class ListProfileBox(ProfileDialog):
 
         column0 = Gtk.TreeViewColumn("Profile", render, text = 1)
         column1 = Gtk.TreeViewColumn("Current", image)
+        column1.set_property('fixed-width', 40)
         column1.set_cell_data_func(image, self.show_current_image)
         view.append_column(column1)
         view.append_column(column0)
@@ -324,28 +328,26 @@ class ListProfileBox(ProfileDialog):
         first = treemodel[iter1][1]
         second = treemodel[iter2][1]
 
-        if first == "Default" or first < second:
+        if first == "Default" or first.lower() < second.lower():
             return -1
-        elif second == "Default" or second < first:
+        elif second == "Default" or second.lower() < first.lower():
             return 1
 
     def show_current_image(self, column, cell, model, iterator, data=None):
         profile = model[iterator][0]
         if profile == context.get_conf().get_current_profile():
             cell.set_property("stock-id", Gtk.STOCK_YES)
+            cell.set_property("stock-size", Gtk.IconSize.LARGE_TOOLBAR)
         else:
             cell.set_property("stock-id", "0")
         return None
 
     def change_selected_profile(self, button):
-
         model,iterator=self.view.get_selection().get_selected()
         if type(iterator) is Gtk.TreeIter:
             profile=model.get_value(iterator,0)
-
             context.get_conf().change_current_profile(profile.name)
-        #self.refresh()
-        context.get_conf().update()
+
         context.get_dispatcher().emit("action-reload-profile")
         self.close()
 
