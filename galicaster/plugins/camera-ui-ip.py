@@ -1,41 +1,24 @@
 # Galicaster-Plugin
+# GTK3 IS COMMENTED OUT
+
 
 import os
 import json
-import gi
+#  import gi
 
-gi.require_version("Gtk", "3.0")
+#  gi.require_version("Gtk", "3.0")
 
-from gi.repository import Gtk, GObject, Gdk
+#  from gi.repository import Gtk, GObject, Gdk
+
+import gtk
+import gtk.glade
+# import gdk
+import gobject
+
+
 from galicaster.core import context
 from galicaster.classui import get_ui_path
-import galicaster.utils.pysca as pysca
 from galicaster.mediapackage import repository
-
-# DEFAULTS
-# This is the default Visca device this plugin talks to
-#DEFAULT_DEVICE = 1
-
-# This is the default preset to set when the camera is recording
-DEFAULT_RECORD_PRESET = 0
-
-# This is the default preset to set when the camera is switching off
-DEFAULT_IDLE_PRESET = 5
-
-# This is the name of this plugin's section in the configuration file
-CONFIG_SECTION = "camera-ui-ip"
-
-# This is the key containing the port (path to the device) to use when recording
-#PORT_KEY = "port"
-
-# This is the key containing the preset to use when recording
-RECORD_PRESET_KEY = 'record-preset'
-
-# This is the key containing the preset to set the camera to just after switching it off
-IDLE_PRESET_KEY= 'idle-preset'
-
-#PRESET TO USE WITH OPENCAST
-WORKFLOW_PRESET = "preset"
 
 
 def init():
@@ -45,36 +28,33 @@ def init():
     recorder = context.get_recorder()
     dispatcher.connect("init", post_init)
 
-    # If port is not defined, a None value will make this method fail
-    #pysca.connect(context.get_conf().get(CONFIG_SECTION, PORT_KEY))
 
-    dispatcher.connect('recorder-starting', on_start_recording)
+    # dispatcher.connect('recorder-starting', on_start_recording)
     # We don't have such thing as a "post-stop" signal, so we have to live with what we do have
-    dispatcher.connect('recorder-stopped', on_stop_recording)
-
+    # dispatcher.connect('recorder-stopped', on_stop_recording)
 
 def post_init(source=None):
     global recorder_ui, brightscale, movescale, zoomscale, presetbutton, flybutton, builder, onoffbutton, prefbutton, recorder
-
 
     # Get a shallow copy of this plugin's configuration
     conf = context.get_conf().get_section(CONFIG_SECTION) or {}
     recorder_ui = context.get_mainwindow().nbox.get_nth_page(0).gui
 
     # load css file
-    cssold = Gtk.CssProvider.get_default()
-    css = Gtk.CssProvider()
-    css.load_from_path(get_ui_path("camera-ui.css"))
+    #cssold = Gtk.CssProvider.get_default()
+    #css = Gtk.CssProvider()
+    #css.load_from_path(get_ui_path("camera-ui.css"))
 
-    Gtk.StyleContext.reset_widgets(Gdk.Screen.get_default())
-    Gtk.StyleContext.add_provider_for_screen(
-        Gdk.Screen.get_default(),
-        css,
-        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-    )
+    #  Gtk.StyleContext.reset_widgets(Gdk.Screen.get_default())
+    #  Gtk.StyleContext.add_provider_for_screen(
+        #  Gdk.Screen.get_default(),
+        #  css,
+        #  Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+    #  )
 
     # load glade file
-    builder = Gtk.Builder()
+    #  builder = Gtk.Builder()
+    builder = gtk.Builder()
     builder.add_from_file(get_ui_path("camera-ui.glade"))
 
     # add new settings tab to the notebook
@@ -174,6 +154,7 @@ def post_init(source=None):
     brightscale.connect("value-changed", set_bright)
     movescale = builder.get_object("movescale")
     zoomscale = builder.get_object("zoomscale")
+
 
 # camera functions
 
