@@ -11,6 +11,8 @@ from galicaster.core import context
 from galicaster.classui import get_ui_path
 import galicaster.utils.pysca as pysca
 from galicaster.mediapackage import repository
+from galicaster.core.core import PAGES
+
 
 # DEFAULTS
 # This is the default Visca device this plugin talks to
