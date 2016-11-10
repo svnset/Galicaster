@@ -166,8 +166,8 @@ class GCrtp(Gst.Bin, base.Base):
             aux = aux.replace("caps-preview !","")
 
 
-        bin = Gst.parse_bin_from_description(aux, True)
-        #bin = Gst.parse_launch("( {} )".format(aux))
+        # bin = Gst.parse_bin_from_description(aux, True)
+        bin = Gst.parse_launch("( {} )".format(aux))
         self.add(bin)
 
         self.set_option_in_pipeline('location', 'gc-rtp-src', 'location')
