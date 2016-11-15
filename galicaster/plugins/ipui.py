@@ -1,68 +1,42 @@
-# Galicaster-Plugin
-
 import gi
 
-gi.require_version("Gtk", "3.0")
+gi.require_version('Gtk', '3.0')
 
-from gi.repository import Gtk, GObject, Gdk
+from gi.repository import Gtk, Gdk, GObject
 from galicaster.core import context
 from galicaster.classui import get_ui_path
-import galicaster.utils.pysca as pysca
-from galicaster.mediapackage import repository
-
-
-# DEFAULTS
-# This is the default Visca device this plugin talks to
-DEFAULT_DEVICE = 1
-
-# This is the default preset to set when the camera is recording
-DEFAULT_RECORD_PRESET = 0
-
-# This is the default preset to set when the camera is switching off
-DEFAULT_IDLE_PRESET = 5
-
-# This is the name of this plugin's section in the configuration file
-CONFIG_SECTION = "camera-ui"
-
-# This is the key containing the port (path to the device) to use when recording
-PORT_KEY = "port"
-
-# This is the key containing the preset to use when recording
-RECORD_PRESET_KEY = 'record-preset'
-
-# This is the key containing the preset to set the camera to just after switching it off
-IDLE_PRESET_KEY= 'idle-preset'
-
-#PRESET TO USE WITH OPENCAST
-WORKFLOW_PRESET = "preset"
+import galicaster.utils.camera_profiles as camera
+#  from galicaster.mediapackage import repository
 
 
 def init():
-    global recorder, dispatcher, logger
+    global cam, recorder, dispatcher, logger
 
+# connect to the camera
+    ip = '134.95.128.120'
+    username = "root"
+    password = "opencast"
+
+    cam = camera.AXIS_V5915()
+    cam.connect(ip, username, password)
     dispatcher = context.get_dispatcher()
-    recorder = context.get_recorder()
-    dispatcher.connect("init", post_init)
-
-    # If port is not defined, a None value will make this method fail
-    #pysca.connect(context.get_conf().get(CONFIG_SECTION, PORT_KEY))
+    dispatcher.connect("init", init_ui)
     logger = context.get_logger()
     logger.info("Cam connected")
-
-    dispatcher.connect('recorder-starting', on_start_recording)
-    # We don't have such thing as a "post-stop" signal, so we have to live with what we do have
-    dispatcher.connect('recorder-stopped', on_stop_recording)
+    #  init_ui()
 
 
-def post_init(element):
-    global recorder_ui, brightscale, movescale, zoomscale, presetbutton, flybutton, builder, onoffbutton, prefbutton, recorder
+def init_ui(element):
+    global recorder_ui, brightscale, movescale, zoomscale, presetlist, presetdelbutton, flybutton, builder, onoffbutton, prefbutton
 
 
-    # Get a shallow copy of this plugin's configuration
-    # conf = context.get_conf().get_section(CONFIG_SECTION) or {}
+    #  conf = contex.get_conf().get_section(CONFIG_SECTION) or {}
     recorder_ui = context.get_mainwindow().nbox.get_nth_page(0).gui
+# window to develop ui independent
+    #  win = Gtk.Window()
+    #  win.connect("delete-event", Gtk.main_quit)
 
-    # load css file
+# load css file
     #  cssold = Gtk.CssProvider.get_default()
     css = Gtk.CssProvider()
     css.load_from_path(get_ui_path("camera-ui.css"))
@@ -76,8 +50,8 @@ def post_init(element):
 
     # load glade file
     builder = Gtk.Builder()
-    builder.add_from_file(get_ui_path("camera-ui.glade"))
-
+    builder.add_from_file(get_ui_path("ipui.glade"))
+    
     # add new settings tab to the notebook
     notebook = recorder_ui.get_object("data_panel")
     mainbox = builder.get_object("mainbox")
@@ -86,9 +60,13 @@ def post_init(element):
     notebook.append_page(mainbox, label)
     notebook.show_all()
 
+    #  win.set_title("Camera-Ctrl")
+    #  win.add(mainbox)
+    #  win.show_all()
 
-    # buttons
-    # movement
+
+# buttons
+# movement
     button = builder.get_object("left")
     button.connect("pressed", move_left)
     button.connect("released", stop_move)
@@ -124,222 +102,168 @@ def post_init(element):
     button = builder.get_object("home")
     button.connect("clicked", move_home)
 
-    # zoom
+# zoom
     button = builder.get_object("zoomin")
     button.connect("pressed", zoom_in)
-    button.connect("released", stop_zoom)
+    button.connect("released", stop_move)
 
     button = builder.get_object("zoomout")
     button.connect("pressed", zoom_out)
-    button.connect("released", stop_zoom)
+    button.connect("released", stop_move)
 
-    # presets
-    button = builder.get_object("1")
-    button.connect("clicked", preset1)
+# presets
+    
+    presetlist = builder.get_object("preset_list")
+    # fill the list with current presets
+    for preset in cam.getPresets():
+        presetlist.append_text(preset.Name)
+    presetlist.connect("changed", change_preset)
 
-    button = builder.get_object("2")
-    button.connect("clicked", preset2)
+# to set a new preset
+    newpreset = builder.get_object("newpreset")
+    newpreset.connect("activate", save_preset)
 
-    button = builder.get_object("3")
-    button.connect("clicked", preset3)
+# to delete a preset
+    presetdelbutton = builder.get_object("presetdel")
 
-    button = builder.get_object("4")
-    button.connect("clicked", preset4)
-
-    button = builder.get_object("5")
-    button.connect("clicked", preset5)
-
-    button = builder.get_object("6")
-    button.connect("clicked", preset6)
-
-    # to set a new preset
-    presetbutton = builder.get_object("preset")
-
-    # fly-mode for camera-movement
+# fly-mode for camera-movement
     flybutton = builder.get_object("fly")
     flybutton.connect("clicked", fly_mode)
 
-    # on-off button
-    onoffbutton = builder.get_object("on-off")
-    onoffbutton.connect("state-set", turn_on_off)
+#  # on-off button
+    #  onoffbutton = builder.get_object("on-off")
+    #  onoffbutton.connect("state-set", turn_on_off)
 
-    # reset all settings
+# reset all settings
     button = builder.get_object("reset")
     button.connect("clicked", reset)
 
-    # show/hide preferences
+# show/hide preferences
     prefbutton = builder.get_object("pref")
     prefbutton.connect("clicked", show_pref)
 
-    # scales
-    brightscale = builder.get_object("brightscale")
-    brightscale.connect("value-changed", set_bright)
+# scales
+    #  brightscale = builder.get_object("brightscale")
+    #  brightscale.connect("value-changed", set_bright)
     movescale = builder.get_object("movescale")
     zoomscale = builder.get_object("zoomscale")
     
+
 # camera functions
 
 # movement functions
 def move_left(button):
     print ("I move left")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=-movescale.get_value())
+    cam.goLeft(movescale.get_value())
 
 
 def move_leftup(button):
     print ("I move leftup")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=-movescale.get_value(), tilt=movescale.get_value())
-
+    cam.goLeftUp(movescale.get_value())
 
 def move_leftdown(button):
     print ("I move leftdown")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=-movescale.get_value(), tilt=-movescale.get_value())
+    cam.goLeftDown(movescale.get_value())
 
 
 def move_right(button):
     print ("I move right")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=movescale.get_value())
+    cam.goRight(movescale.get_value())
 
 
 def move_rightup(button):
     print ("I move rightup")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=movescale.get_value(), tilt=movescale.get_value())
-
+    cam.goRightUp(movescale.get_value())
 
 def move_rightdown(button):
     print ("I move rightdown")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=movescale.get_value(), tilt=-movescale.get_value())
+    cam.goRightDown(movescale.get_value())
 
 
 def move_up(button):
     print ("I move up")
-    pysca.pan_tilt(DEFAULT_DEVICE, tilt=movescale.get_value())
+    cam.goUp(movescale.get_value())
 
 
 def move_down(button):
     print ("I move down")
-    pysca.pan_tilt(DEFAULT_DEVICE, tilt=-movescale.get_value())
+    cam.goDown(movescale.get_value())
 
 
 def stop_move(button):
     print ("I make a break")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=0, tilt=0)
+    cam.stop()
 
 
 def move_home(button):
     print ("I move home")
-    pysca.pan_tilt_home(DEFAULT_DEVICE)
+    cam.goHome()
 
 
 # zoom functions
 def zoom_in(button):
     print ("zoom in")
-    pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_TELE, speed=zoomscale.get_value())
+    cam.zoom_in(zoomscale.get_value())
 
 
 def zoom_out(button):
     print ("zoom out")
-    pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_WIDE, speed=zoomscale.get_value())
-
-
-def stop_zoom(button):
-    print ("stop zoom")
-    pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_STOP)
+    cam.zoom_out(zoomscale.get_value())
 
 
 # preset functions
-def preset1(button):
-    if presetbutton.get_active():
-        pysca.set_memory(DEFAULT_DEVICE, 0)
-        presetbutton.set_active(False)
+def change_preset(presetlist):
+    if presetdelbutton.get_active():
+        cam.removePreset(cam.identifyPreset(presetlist.get_active_text()))
+        presetdelbutton.set_active(False)
+        presetlist.remove(presetlist.get_active())
+        
     else:
-        pysca.recall_memory(DEFAULT_DEVICE, 0)
+        if not presetlist.get_active_text() is None:
+            print("Going to: " + presetlist.get_active_text())
+            cam.goToPreset(cam.identifyPreset(presetlist.get_active_text()))
+            presetlist.set_active(-1)
 
 
-def preset2(button):
-    if presetbutton.get_active():
-        pysca.set_memory(DEFAULT_DEVICE, 1)
-        presetbutton.set_active(False)
-    else:
-        pysca.recall_memory(DEFAULT_DEVICE, 1)
-
-
-def preset3(button):
-    if presetbutton.get_active():
-        pysca.set_memory(DEFAULT_DEVICE, 2)
-        presetbutton.set_active(False)
-    else:
-        pysca.recall_memory(DEFAULT_DEVICE, 2)
-
-
-def preset4(button):
-    if presetbutton.get_active():
-        pysca.set_memory(DEFAULT_DEVICE, 3)
-        presetbutton.set_active(False)
-    else:
-        pysca.recall_memory(DEFAULT_DEVICE, 3)
-
-
-def preset5(button):
-    if presetbutton.get_active():
-        pysca.set_memory(DEFAULT_DEVICE, 4)
-        presetbutton.set_active(False)
-    else:
-        pysca.recall_memory(DEFAULT_DEVICE, 4)
-
-
-def preset6(button):
-    if presetbutton.get_active():
-        pysca.set_memory(DEFAULT_DEVICE, 5)
-        presetbutton.set_active(False)
-    else:
-        pysca.recall_memory(DEFAULT_DEVICE, 5)
+def save_preset(newpreset):
+    cam.setPreset(newpreset.get_text())
+    presetlist.append_text(newpreset.get_text())
+    newpreset.set_text("")
 
 
 # brightness scale
 def set_bright(brightscale):
-    pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
-    pysca.set_brightness(DEFAULT_DEVICE, brightscale.get_value() + 15)
-
+    return None
 
 # reset all settings
 def reset(button):
-    # reset brightness
-    pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
-    pysca.set_brightness(DEFAULT_DEVICE, 15)
-    brightscale.set_value(0)
-    movescale.set_value(7)
-    zoomscale.set_value(3.5)
-    # reset zoom
-    pysca.set_zoom(DEFAULT_DEVICE, 0000)
+    movescale.set_value(0.5)
+    zoomscale.set_value(0.5)
     # reset location
-    pysca.pan_tilt_home(DEFAULT_DEVICE)
+    cam.goHome()
 
-
-# turns the camera on/off
-def turn_on_off(onoffbutton, self):
-    if onoffbutton.get_active():
-        pysca.set_power_on(DEFAULT_DEVICE, True)
-    else:
-        pysca.set_power_on(DEFAULT_DEVICE, False)
+#  # turns the camera on/off
+#  def turn_on_off(onoffbutton, self):
+    #  if onoffbutton.get_active():
+        #  pysca.set_power_on(DEFAULT_DEVICE, True)
+    #  else:
+        #  pysca.set_power_on(DEFAULT_DEVICE, False)
 
 
 # hides/shows the advanced preferences
 def show_pref(prefbutton):
     scalebox1 = builder.get_object("scales1")
     scalebox2 = builder.get_object("scales2")
-    scalebox3 = builder.get_object("scales3")
     # settings button activated
     if scalebox1.get_property("visible"):
         print ("hide advanced settings")
         scalebox1.hide()
         scalebox2.hide()
-        scalebox3.hide()
     # settings button deactivated
     else:
         print ("show advanced settings")
         scalebox1.show()
         scalebox2.show()
-        scalebox3.show()
 
 
 
@@ -438,39 +362,5 @@ def fly_mode(flybutton):
         button.set_image(img)
         button.connect("clicked", move_home)
 
-
-
-def on_start_recording(elem):
-
-    global repo
-    # Get a shallow copy of this plugin's configuration
-    config = context.get_conf().get_section(CONFIG_SECTION) or {}
-
-    # Get the repository to find all relevant mediapackages
-    #TODO TEST THE OC_PRESET WITH A CAMERA!!!!!
-    repo = repository.Repository()
-    mp = repo.get_next_mediapackage()
-    properties = mp.getOCCaptureAgentProperties()
-    OC_PRESET = int (properties['org.opencastproject.workflow.config.camera-preset'])
-    if OC_PRESET == None:
-        OC_PRESET = config.get(RECORD_PRESET_KEY, DEFAULT_RECORD_PRESET)
-    try:
-
-        pysca.set_power_on(DEFAULT_DEVICE, True, ) # TODO handler
-        onoffbutton.set_active(True)
-        pysca.recall_memory(DEFAULT_DEVICE, (OC_PRESET))
-
-    except Exception as e:
-        logger.warn("Error accessing the Visca device %u on recording start. The recording may be incorrect! Error: %s" % (DEFAULT_DEVICE, e))
-
-def on_stop_recording(elem,elem2):
-
-    # Get a shallow copy of this plugin's configuration
-    config = context.get_conf().get_section(CONFIG_SECTION) or {}
-
-    try:
-        pysca.recall_memory(DEFAULT_DEVICE, config.get(IDLE_PRESET_KEY, DEFAULT_IDLE_PRESET))
-        pysca.set_power_on(DEFAULT_DEVICE, False)
-        onoffbutton.set_active(False)
-    except Exception as e:
-        logger.warn("Error accessing the Visca device %u on recording end. The recording may be incorrect! Error: %s" % (DEFAULT_DEVICE, e))
+# start
+#  init()
