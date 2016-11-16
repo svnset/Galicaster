@@ -32,12 +32,8 @@ def init_ui(element):
 
     #  conf = contex.get_conf().get_section(CONFIG_SECTION) or {}
     recorder_ui = context.get_mainwindow().nbox.get_nth_page(0).gui
-# window to develop ui independent
-    #  win = Gtk.Window()
-    #  win.connect("delete-event", Gtk.main_quit)
 
 # load css file
-    #  cssold = Gtk.CssProvider.get_default()
     css = Gtk.CssProvider()
     css.load_from_path(get_ui_path("camera-ui.css"))
 
@@ -59,10 +55,6 @@ def init_ui(element):
     mainbox.show_all()
     notebook.append_page(mainbox, label)
     notebook.show_all()
-
-    #  win.set_title("Camera-Ctrl")
-    #  win.add(mainbox)
-    #  win.show_all()
 
 
 # buttons
@@ -122,6 +114,8 @@ def init_ui(element):
 # to set a new preset
     newpreset = builder.get_object("newpreset")
     newpreset.connect("activate", save_preset)
+    newpreset.connect("icon-press", save_preset_icon)
+
 
 # to delete a preset
     presetdelbutton = builder.get_object("presetdel")
@@ -223,6 +217,12 @@ def change_preset(presetlist):
             print("Going to: " + presetlist.get_active_text())
             cam.goToPreset(cam.identifyPreset(presetlist.get_active_text()))
             presetlist.set_active(-1)
+
+
+def save_preset_icon(newpreset, pos, event):
+    cam.setPreset(newpreset.get_text())
+    presetlist.append_text(newpreset.get_text())
+    newpreset.set_text("")
 
 
 def save_preset(newpreset):
