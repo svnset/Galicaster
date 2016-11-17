@@ -22,7 +22,7 @@ DEFAULT_RECORD_PRESET = 0
 DEFAULT_IDLE_PRESET = 5
 
 # This is the name of this plugin's section in the configuration file
-CONFIG_SECTION = "camera-ui"
+CONFIG_SECTION = "cameraui"
 
 # This is the key containing the port (path to the device) to use when recording
 PORT_KEY = "port"
@@ -39,33 +39,34 @@ WORKFLOW_PRESET = "preset"
 
 def init():
     global recorder, dispatcher, logger
-
+    
+    print("HELLO WORLD")
     dispatcher = context.get_dispatcher()
     recorder = context.get_recorder()
-    dispatcher.connect("init", post_init)
+    dispatcher.connect("init", init_ui)
 
     # If port is not defined, a None value will make this method fail
     #pysca.connect(context.get_conf().get(CONFIG_SECTION, PORT_KEY))
     logger = context.get_logger()
     logger.info("Cam connected")
 
-    dispatcher.connect('recorder-starting', on_start_recording)
+    #  dispatcher.connect('recorder-starting', on_start_recording)
     # We don't have such thing as a "post-stop" signal, so we have to live with what we do have
-    dispatcher.connect('recorder-stopped', on_stop_recording)
+    #  dispatcher.connect('recorder-stopped', on_stop_recording)
 
 
-def post_init(element):
+def init_ui(element):
     global recorder_ui, brightscale, movescale, zoomscale, presetbutton, flybutton, builder, onoffbutton, prefbutton, recorder
 
 
     # Get a shallow copy of this plugin's configuration
     # conf = context.get_conf().get_section(CONFIG_SECTION) or {}
     recorder_ui = context.get_mainwindow().nbox.get_nth_page(0).gui
-
+    Gtk.blabla
     # load css file
     #  cssold = Gtk.CssProvider.get_default()
     css = Gtk.CssProvider()
-    css.load_from_path(get_ui_path("camera-ui.css"))
+    css.load_from_path(get_ui_path("cameraui.css"))
 
     Gtk.StyleContext.reset_widgets(Gdk.Screen.get_default())
     Gtk.StyleContext.add_provider_for_screen(
@@ -76,7 +77,7 @@ def post_init(element):
 
     # load glade file
     builder = Gtk.Builder()
-    builder.add_from_file(get_ui_path("camera-ui.glade"))
+    builder.add_from_file(get_ui_path("cameraui.glade"))
 
     # add new settings tab to the notebook
     notebook = recorder_ui.get_object("data_panel")

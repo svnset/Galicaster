@@ -27,7 +27,7 @@ def init():
 
 
 def init_ui(element):
-    global recorder_ui, brightscale, movescale, zoomscale, presetlist, presetdelbutton, flybutton, builder, onoffbutton, prefbutton
+    global recorder_ui, brightscale, movescale, zoomscale, presetlist, presetdelbutton, flybutton, builder, prefbutton
 
 
     #  conf = contex.get_conf().get_section(CONFIG_SECTION) or {}
@@ -35,7 +35,7 @@ def init_ui(element):
 
 # load css file
     css = Gtk.CssProvider()
-    css.load_from_path(get_ui_path("camera-ui.css"))
+    css.load_from_path(get_ui_path("cameraui.css"))
 
     Gtk.StyleContext.reset_widgets(Gdk.Screen.get_default())
     Gtk.StyleContext.add_provider_for_screen(

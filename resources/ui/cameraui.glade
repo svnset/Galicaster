@@ -53,7 +53,7 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="tooltip_text" translatable="yes">Aktiviert den Fang-Modus zum Speichern von Voreinstellungen.</property>
-    <property name="icon_name">semi-starred-rtl-symbolic</property>
+    <property name="stock">gtk-new</property>
   </object>
   <object class="GtkImage" id="resetimg">
     <property name="visible">True</property>
