@@ -119,6 +119,7 @@ def init_ui(element):
 
 # to delete a preset
     presetdelbutton = builder.get_object("presetdel")
+    presetdelbutton.connect("pressed", empty_entry)
 
 # fly-mode for camera-movement
     flybutton = builder.get_object("fly")
@@ -216,8 +217,10 @@ def change_preset(presetlist):
         if not presetlist.get_active_text() is None:
             print("Going to: " + presetlist.get_active_text())
             cam.goToPreset(cam.identifyPreset(presetlist.get_active_text()))
-            presetlist.set_active(-1)
+            #presetlist.set_active(-1)
 
+def empty_entry(presetdelbutton):
+    presetlist.set_active(-1)
 
 def save_preset_icon(newpreset, pos, event):
     cam.setPreset(newpreset.get_text())
