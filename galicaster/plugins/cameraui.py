@@ -46,13 +46,13 @@ def init():
     dispatcher.connect("init", init_ui)
 
     # If port is not defined, a None value will make this method fail
-    #pysca.connect(context.get_conf().get(CONFIG_SECTION, PORT_KEY))
+    pysca.connect(context.get_conf().get(CONFIG_SECTION, PORT_KEY))
     logger = context.get_logger()
     logger.info("Cam connected")
 
-    #  dispatcher.connect('recorder-starting', on_start_recording)
+    dispatcher.connect('recorder-starting', on_start_recording)
     # We don't have such thing as a "post-stop" signal, so we have to live with what we do have
-    #  dispatcher.connect('recorder-stopped', on_stop_recording)
+    dispatcher.connect('recorder-stopped', on_stop_recording)
 
 
 def init_ui(element):
@@ -60,11 +60,11 @@ def init_ui(element):
 
 
     # Get a shallow copy of this plugin's configuration
-    # conf = context.get_conf().get_section(CONFIG_SECTION) or {}
+    conf = context.get_conf().get_section(CONFIG_SECTION) or {}
     recorder_ui = context.get_mainwindow().nbox.get_nth_page(0).gui
     Gtk.blabla
+
     # load css file
-    #  cssold = Gtk.CssProvider.get_default()
     css = Gtk.CssProvider()
     css.load_from_path(get_ui_path("cameraui.css"))
 
