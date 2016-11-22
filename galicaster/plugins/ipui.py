@@ -104,7 +104,7 @@ def init_ui(element):
 # presets
     presetlist = builder.get_object("preset_list")
     # add home position to list
-    presetlist.insert(1,"home","home")
+    presetlist.insert(0,"home","home")
     # fill the list with current presets
     for preset in cam.getPresets():
         presetlist.append_text(preset.Name)
@@ -118,7 +118,7 @@ def init_ui(element):
 
 # to delete a preset
     presetdelbutton = builder.get_object("presetdel")
-    presetdelbutton.connect("pressed", empty_entry)
+    presetdelbutton.connect("clicked", empty_entry)
 
 # fly-mode for camera-movement
     flybutton = builder.get_object("fly")
@@ -201,8 +201,6 @@ def stop_move(button):
 
 def move_home(button):
     print ("I move home")
-    #  cam.goHome()
-    #  presetlist.set_active(-1)
     presetlist.set_active_id("home")
 
 
@@ -225,7 +223,7 @@ def change_preset(presetlist):
         print("Going Home")
         cam.goHome()        
     else:
-        if presetdelbutton.get_active():
+        if presetdelbutton.get_active() and not presetlist.get_active_text() is None:
             cam.removePreset(cam.identifyPreset(presetlist.get_active_text()))
             presetdelbutton.set_active(False)
             presetlist.remove(presetlist.get_active())
@@ -235,11 +233,14 @@ def change_preset(presetlist):
                 print("Going to: " + presetlist.get_active_text())
                 cam.goToPreset(cam.identifyPreset(presetlist.get_active_text()))
 
-def empty_entry(presetdelbutton):
-    presetlist.set_active(-1)
 
-def set_home_label(button):
-    presetlist.set_active_id("home")
+def empty_entry(presetdelbutton):
+    if presetdelbutton.get_active():
+        presetlist.set_active(-1)
+        presetlist.remove(0)
+    elif not presetdelbutton.get_active():
+        presetlist.insert(0,"home","home")
+
 
 def save_preset_icon(newpreset, pos, event):
     if newpreset.get_text() == "home":
@@ -341,7 +342,6 @@ def fly_mode(flybutton):
         button.set_image(img)
         button.connect("clicked", stop_move)
 
-
     # fly mode turned off
     else:
         print("fly mode turned off")
@@ -391,6 +391,3 @@ def fly_mode(flybutton):
         GObject.signal_handlers_destroy(button)
         button.set_image(img)
         button.connect("clicked", move_home)
-
-# start
-#  init()
