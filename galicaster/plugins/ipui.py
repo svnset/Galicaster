@@ -201,8 +201,9 @@ def stop_move(button):
 
 def move_home(button):
     print ("I move home")
-    cam.goHome()
-    presetlist.set_active(-1)
+    #  cam.goHome()
+    #  presetlist.set_active(-1)
+    presetlist.set_active_id("home")
 
 
 # zoom functions
