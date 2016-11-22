@@ -40,7 +40,6 @@ WORKFLOW_PRESET = "preset"
 def init():
     global recorder, dispatcher, logger
     
-    print("HELLO WORLD")
     dispatcher = context.get_dispatcher()
     recorder = context.get_recorder()
     dispatcher.connect("init", init_ui)
@@ -62,7 +61,6 @@ def init_ui(element):
     # Get a shallow copy of this plugin's configuration
     conf = context.get_conf().get_section(CONFIG_SECTION) or {}
     recorder_ui = context.get_mainwindow().nbox.get_nth_page(0).gui
-    Gtk.blabla
 
     # load css file
     css = Gtk.CssProvider()

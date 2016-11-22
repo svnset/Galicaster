@@ -23,12 +23,10 @@ def init():
     dispatcher.connect("init", init_ui)
     logger = context.get_logger()
     logger.info("Cam connected")
-    #  init_ui()
 
 
 def init_ui(element):
     global recorder_ui, brightscale, movescale, zoomscale, presetlist, presetdelbutton, flybutton, builder, prefbutton
-
 
     #  conf = contex.get_conf().get_section(CONFIG_SECTION) or {}
     recorder_ui = context.get_mainwindow().nbox.get_nth_page(0).gui
@@ -104,8 +102,9 @@ def init_ui(element):
     button.connect("released", stop_move)
 
 # presets
-    
     presetlist = builder.get_object("preset_list")
+    # add home position to list
+    presetlist.insert(1,"home","home")
     # fill the list with current presets
     for preset in cam.getPresets():
         presetlist.append_text(preset.Name)
@@ -150,39 +149,49 @@ def init_ui(element):
 def move_left(button):
     print ("I move left")
     cam.goLeft(movescale.get_value())
+    presetlist.set_active(-1)
 
 
 def move_leftup(button):
     print ("I move leftup")
     cam.goLeftUp(movescale.get_value())
+    presetlist.set_active(-1)
+
 
 def move_leftdown(button):
     print ("I move leftdown")
     cam.goLeftDown(movescale.get_value())
+    presetlist.set_active(-1)
 
 
 def move_right(button):
     print ("I move right")
     cam.goRight(movescale.get_value())
+    presetlist.set_active(-1)
 
 
 def move_rightup(button):
     print ("I move rightup")
     cam.goRightUp(movescale.get_value())
+    presetlist.set_active(-1)
+
 
 def move_rightdown(button):
     print ("I move rightdown")
     cam.goRightDown(movescale.get_value())
+    presetlist.set_active(-1)
 
 
 def move_up(button):
     print ("I move up")
     cam.goUp(movescale.get_value())
+    presetlist.set_active(-1)
 
 
 def move_down(button):
     print ("I move down")
     cam.goDown(movescale.get_value())
+    presetlist.set_active(-1)
 
 
 def stop_move(button):
@@ -193,45 +202,62 @@ def stop_move(button):
 def move_home(button):
     print ("I move home")
     cam.goHome()
+    presetlist.set_active(-1)
 
 
 # zoom functions
 def zoom_in(button):
     print ("zoom in")
     cam.zoom_in(zoomscale.get_value())
+    presetlist.set_active(-1)
 
 
 def zoom_out(button):
     print ("zoom out")
     cam.zoom_out(zoomscale.get_value())
+    presetlist.set_active(-1)
 
 
 # preset functions
 def change_preset(presetlist):
-    if presetdelbutton.get_active():
-        cam.removePreset(cam.identifyPreset(presetlist.get_active_text()))
-        presetdelbutton.set_active(False)
-        presetlist.remove(presetlist.get_active())
-        
+    if presetlist.get_active_text() == "home":
+        print("Going Home")
+        cam.goHome()        
     else:
-        if not presetlist.get_active_text() is None:
-            print("Going to: " + presetlist.get_active_text())
-            cam.goToPreset(cam.identifyPreset(presetlist.get_active_text()))
-            #presetlist.set_active(-1)
+        if presetdelbutton.get_active():
+            cam.removePreset(cam.identifyPreset(presetlist.get_active_text()))
+            presetdelbutton.set_active(False)
+            presetlist.remove(presetlist.get_active())
+            
+        else:
+            if not presetlist.get_active_text() is None:
+                print("Going to: " + presetlist.get_active_text())
+                cam.goToPreset(cam.identifyPreset(presetlist.get_active_text()))
 
 def empty_entry(presetdelbutton):
     presetlist.set_active(-1)
 
+def set_home_label(button):
+    presetlist.set_active_id("home")
+
 def save_preset_icon(newpreset, pos, event):
-    cam.setPreset(newpreset.get_text())
-    presetlist.append_text(newpreset.get_text())
-    newpreset.set_text("")
+    if newpreset.get_text() == "home":
+        cam.setHome()
+        newpreset.set_text("")
+    else:
+        cam.setPreset(newpreset.get_text())
+        presetlist.append_text(newpreset.get_text())
+        newpreset.set_text("")
 
 
 def save_preset(newpreset):
-    cam.setPreset(newpreset.get_text())
-    presetlist.append_text(newpreset.get_text())
-    newpreset.set_text("")
+    if newpreset.get_text() == "home":
+        cam.setHome()
+        newpreset.set_text("")
+    else:
+        cam.setPreset(newpreset.get_text())
+        presetlist.append_text(newpreset.get_text())
+        newpreset.set_text("")
 
 
 # brightness scale
