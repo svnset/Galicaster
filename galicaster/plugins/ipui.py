@@ -9,26 +9,50 @@ import galicaster.utils.camera_profiles as camera
 #  from galicaster.mediapackage import repository
 
 
+#DEFAULTS
+# This is the default preset to set when the camera is recording
+DEFAULT_RECORD_PRESET = "record" 
+
+# This is the default preset to set when the camera is switching off
+DEFAULT_IDLE_PRESET = "idle" 
+
+# This is the key containing the preset to use when recording
+RECORD_PRESET_KEY = 'record-preset'
+
+# This is the key containing the preset to set the camera to just after switching it off
+IDLE_PRESET_KEY= 'idle-preset'
+
+# This is the name of this plugin's section in the configuration file
+CONFIG_SECTION = "ipui"
+
 def init():
-    global cam, recorder, dispatcher, logger
+    global cam, recorder, dispatcher, logger, config, repo
 
 # connect to the camera
     ip = '134.95.128.120'
     username = "root"
     password = "opencast"
-
+    
     cam = camera.AXIS_V5915()
     cam.connect(ip, username, password)
+
+
     dispatcher = context.get_dispatcher()
-    dispatcher.connect("init", init_ui)
+    repo = context.get_repository()
+    #  repo = repository.Repository()
     logger = context.get_logger()
+    config = context.get_conf().get_section(CONFIG_SECTION) or {}
+
+
+    dispatcher.connect("init", init_ui)
+    dispatcher.connect("recorder-starting", on_start_recording)
+    dispatcher.connect("recorder-stopped", on_stop_recording)
     logger.info("Cam connected")
 
 
 def init_ui(element):
     global recorder_ui, brightscale, movescale, zoomscale, presetlist, presetdelbutton, flybutton, builder, prefbutton
 
-    #  conf = contex.get_conf().get_section(CONFIG_SECTION) or {}
     recorder_ui = context.get_mainwindow().nbox.get_nth_page(0).gui
 
 # load css file
@@ -273,13 +297,6 @@ def reset(button):
     # reset location
     cam.goHome()
 
-#  # turns the camera on/off
-#  def turn_on_off(onoffbutton, self):
-    #  if onoffbutton.get_active():
-        #  pysca.set_power_on(DEFAULT_DEVICE, True)
-    #  else:
-        #  pysca.set_power_on(DEFAULT_DEVICE, False)
-
 
 # hides/shows the advanced preferences
 def show_pref(prefbutton):
@@ -295,7 +312,6 @@ def show_pref(prefbutton):
         print ("show advanced settings")
         scalebox1.show()
         scalebox2.show()
-
 
 
 # flymode activation connects clicked signal and disconnects
@@ -391,3 +407,29 @@ def fly_mode(flybutton):
         GObject.signal_handlers_destroy(button)
         button.set_image(img)
         button.connect("clicked", move_home)
+
+
+def on_start_recording(elem):
+    
+    preset = config.get(RECORD_PRESET_KEY, DEFAULT_RECORD_PRESET)
+    mp = repo.get_next_mediapackage()
+
+    if not mp is None:
+        properties = mp.getOCCaptureAgentProperties()
+        preset = int (properties['org.opencastproject.workflow.config.camera-preset'])
+
+    try:
+        cam.goToPreset(cam.identifyPreset(preset))
+
+    except Exception as e:
+        logger.warn("Error accessing the IP camera on recording start. The recording may be incorrect! Error:", e)
+
+
+def on_stop_recording(elem,elem2):
+
+    try:
+        cam.goToPreset(cam.identifyPreset(config.get(IDLE_PRESET_KEY, DEFAULT_IDLE_PRESET)))
+
+    except Exception as e:
+        logger.warn("Error accessing the IP camera on recording end. The recording may be incorrect! Error: ", e)
+
