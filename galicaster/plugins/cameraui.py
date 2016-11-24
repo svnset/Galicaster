@@ -8,7 +8,7 @@ from gi.repository import Gtk, GObject, Gdk
 from galicaster.core import context
 from galicaster.classui import get_ui_path
 import galicaster.utils.pysca as pysca
-from galicaster.mediapackage import repository
+#  from galicaster.mediapackage import repository
 
 
 # DEFAULTS
@@ -38,28 +38,28 @@ WORKFLOW_PRESET = "preset"
 
 
 def init():
-    global recorder, dispatcher, logger
+    global recorder, dispatcher, logger, config, repo
     
     dispatcher = context.get_dispatcher()
     recorder = context.get_recorder()
-    dispatcher.connect("init", init_ui)
+    logger = context.get_logger()
+    repo = context.get_repository()
+    # repo = repository.Repository
+    config = context.get_conf().get_section(CONFIG_SECTION) or {}
 
     # If port is not defined, a None value will make this method fail
-    pysca.connect(context.get_conf().get(CONFIG_SECTION, PORT_KEY))
-    logger = context.get_logger()
-    logger.info("Cam connected")
+    pysca.connect(config.get(PORT_KEY))
 
+
+    dispatcher.connect("init", init_ui)
     dispatcher.connect('recorder-starting', on_start_recording)
-    # We don't have such thing as a "post-stop" signal, so we have to live with what we do have
     dispatcher.connect('recorder-stopped', on_stop_recording)
+    logger.info("Cam connected")
 
 
 def init_ui(element):
-    global recorder_ui, brightscale, movescale, zoomscale, presetbutton, flybutton, builder, onoffbutton, prefbutton, recorder
+    global recorder_ui, brightscale, movescale, zoomscale, presetbutton, flybutton, builder, onoffbutton, prefbutton
 
-
-    # Get a shallow copy of this plugin's configuration
-    conf = context.get_conf().get_section(CONFIG_SECTION) or {}
     recorder_ui = context.get_mainwindow().nbox.get_nth_page(0).gui
 
     # load css file
@@ -438,38 +438,30 @@ def fly_mode(flybutton):
         button.connect("clicked", move_home)
 
 
-
 def on_start_recording(elem):
 
-    global repo
-    # Get a shallow copy of this plugin's configuration
-    config = context.get_conf().get_section(CONFIG_SECTION) or {}
-
-    # Get the repository to find all relevant mediapackages
-    #TODO TEST THE OC_PRESET WITH A CAMERA!!!!!
-    repo = repository.Repository()
+    preset = config.get(RECORD_PRESET_KEY, DEFAULT_RECORD_PRESET)
     mp = repo.get_next_mediapackage()
-    properties = mp.getOCCaptureAgentProperties()
-    OC_PRESET = int (properties['org.opencastproject.workflow.config.camera-preset'])
-    if OC_PRESET == None:
-        OC_PRESET = config.get(RECORD_PRESET_KEY, DEFAULT_RECORD_PRESET)
-    try:
 
-        pysca.set_power_on(DEFAULT_DEVICE, True, ) # TODO handler
+    if mp is not None:
+        properties = mp.getOCCaptureAgentProperties()
+        preset = int(properties['org.opencastproject.workflow.config.camera-preset'])
+
+    try:
+        pysca.set_power_on(DEFAULT_DEVICE, True, ) 
         onoffbutton.set_active(True)
-        pysca.recall_memory(DEFAULT_DEVICE, (OC_PRESET))
+        pysca.recall_memory(DEFAULT_DEVICE, (preset))
 
     except Exception as e:
         logger.warn("Error accessing the Visca device %u on recording start. The recording may be incorrect! Error: %s" % (DEFAULT_DEVICE, e))
 
-def on_stop_recording(elem,elem2):
 
-    # Get a shallow copy of this plugin's configuration
-    config = context.get_conf().get_section(CONFIG_SECTION) or {}
+def on_stop_recording(elem, elem2):
 
     try:
         pysca.recall_memory(DEFAULT_DEVICE, config.get(IDLE_PRESET_KEY, DEFAULT_IDLE_PRESET))
         pysca.set_power_on(DEFAULT_DEVICE, False)
         onoffbutton.set_active(False)
+
     except Exception as e:
         logger.warn("Error accessing the Visca device %u on recording end. The recording may be incorrect! Error: %s" % (DEFAULT_DEVICE, e))

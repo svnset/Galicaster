@@ -414,9 +414,9 @@ def on_start_recording(elem):
     preset = config.get(RECORD_PRESET_KEY, DEFAULT_RECORD_PRESET)
     mp = repo.get_next_mediapackage()
 
-    if not mp is None:
+    if mp is not None:
         properties = mp.getOCCaptureAgentProperties()
-        preset = int (properties['org.opencastproject.workflow.config.camera-preset'])
+        preset = int(properties['org.opencastproject.workflow.config.camera-preset'])
 
     try:
         cam.goToPreset(cam.identifyPreset(preset))
@@ -425,11 +425,10 @@ def on_start_recording(elem):
         logger.warn("Error accessing the IP camera on recording start. The recording may be incorrect! Error:", e)
 
 
-def on_stop_recording(elem,elem2):
+def on_stop_recording(elem, elem2):
 
     try:
         cam.goToPreset(cam.identifyPreset(config.get(IDLE_PRESET_KEY, DEFAULT_IDLE_PRESET)))
 
     except Exception as e:
         logger.warn("Error accessing the IP camera on recording end. The recording may be incorrect! Error: ", e)
-
