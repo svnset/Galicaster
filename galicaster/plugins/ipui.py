@@ -131,7 +131,7 @@ def init_ui(element):
     presetlist.insert(0,"home","home")
     # fill the list with current presets
     for preset in cam.getPresets():
-        presetlist.append_text(preset.Name)
+        presetlist.append(preset.Name, preset.Name)
     presetlist.connect("changed", change_preset)
 
 # to set a new preset
@@ -272,7 +272,8 @@ def save_preset_icon(newpreset, pos, event):
         newpreset.set_text("")
     else:
         cam.setPreset(newpreset.get_text())
-        presetlist.append_text(newpreset.get_text())
+        presetlist.append(newpreset.get_text(), newpreset.get_text())
+        presetlist.set_active_id(newpreset.get_text())
         newpreset.set_text("")
 
 
@@ -282,7 +283,8 @@ def save_preset(newpreset):
         newpreset.set_text("")
     else:
         cam.setPreset(newpreset.get_text())
-        presetlist.append_text(newpreset.get_text())
+        presetlist.append(newpreset.get_text(), newpreset.get_text())
+        presetlist.set_active_id(newpreset.get_text())
         newpreset.set_text("")
 
 
@@ -419,7 +421,8 @@ def on_start_recording(elem):
         preset = int(properties['org.opencastproject.workflow.config.camera-preset'])
 
     try:
-        cam.goToPreset(cam.identifyPreset(preset))
+        presetlist.set_active_id(preset)
+        #  cam.goToPreset(cam.identifyPreset(preset))
 
     except Exception as e:
         logger.warn("Error accessing the IP camera on recording start. The recording may be incorrect! Error:", e)
@@ -428,7 +431,8 @@ def on_start_recording(elem):
 def on_stop_recording(elem, elem2):
 
     try:
-        cam.goToPreset(cam.identifyPreset(config.get(IDLE_PRESET_KEY, DEFAULT_IDLE_PRESET)))
+        presetlist.set_active_id(config.get(IDLE_PRESET_KEY, DEFAULT_IDLE_PRESET))
+        #  cam.goToPreset(cam.identifyPreset(config.get(IDLE_PRESET_KEY, DEFAULT_IDLE_PRESET)))
 
     except Exception as e:
         logger.warn("Error accessing the IP camera on recording end. The recording may be incorrect! Error: ", e)
