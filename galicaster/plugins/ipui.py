@@ -51,7 +51,7 @@ def init():
 
 
 def init_ui(element):
-    global recorder_ui, brightscale, movescale, zoomscale, presetlist, presetdelbutton, flybutton, builder, prefbutton
+    global recorder_ui, brightscale, movescale, zoomscale, presetlist, presetdelbutton, flybutton, builder, prefbutton, newpreset
 
     recorder_ui = context.get_mainwindow().nbox.get_nth_page(0).gui
 
@@ -148,10 +148,6 @@ def init_ui(element):
     flybutton = builder.get_object("fly")
     flybutton.connect("clicked", fly_mode)
 
-#  # on-off button
-    #  onoffbutton = builder.get_object("on-off")
-    #  onoffbutton.connect("state-set", turn_on_off)
-
 # reset all settings
     button = builder.get_object("reset")
     button.connect("clicked", reset)
@@ -243,7 +239,12 @@ def zoom_out(button):
 
 # preset functions
 def change_preset(presetlist):
-    if presetlist.get_active_text() == "home":
+    if len(newpreset.get_text()) > 0:
+        if newpreset.get_text() == "home":
+            print ("New Home set to current position.")
+        else:
+            print("New Preset saved: ", newpreset.get_text())
+    elif presetlist.get_active_text() == "home":
         print("Going Home")
         cam.goHome()        
     else:
@@ -269,6 +270,7 @@ def empty_entry(presetdelbutton):
 def save_preset_icon(newpreset, pos, event):
     if newpreset.get_text() == "home":
         cam.setHome()
+        presetlist.set_active_id(newpreset.get_text())
         newpreset.set_text("")
     else:
         cam.setPreset(newpreset.get_text())
@@ -280,6 +282,7 @@ def save_preset_icon(newpreset, pos, event):
 def save_preset(newpreset):
     if newpreset.get_text() == "home":
         cam.setHome()
+        presetlist.set_active_id(newpreset.get_text())
         newpreset.set_text("")
     else:
         cam.setPreset(newpreset.get_text())
