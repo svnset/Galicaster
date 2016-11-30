@@ -445,7 +445,7 @@ def on_start_recording(elem):
 
     if mp is not None:
         properties = mp.getOCCaptureAgentProperties()
-        preset = int(properties['org.opencastproject.workflow.config.camera-preset'])
+        preset = int(properties['org.opencastproject.workflow.config.cameraPreset'])
 
     try:
         pysca.set_power_on(DEFAULT_DEVICE, True, ) 

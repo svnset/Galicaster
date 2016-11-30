@@ -421,7 +421,7 @@ def on_start_recording(elem):
 
     if mp is not None:
         properties = mp.getOCCaptureAgentProperties()
-        preset = int(properties['org.opencastproject.workflow.config.camera-preset'])
+        preset = properties['org.opencastproject.workflow.config.cameraPreset']
 
     try:
         presetlist.set_active_id(preset)
