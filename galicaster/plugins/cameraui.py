@@ -8,8 +8,6 @@ from gi.repository import Gtk, GObject, Gdk
 from galicaster.core import context
 from galicaster.classui import get_ui_path
 import galicaster.utils.pysca as pysca
-#  from galicaster.mediapackage import repository
-
 
 # DEFAULTS
 # This is the default Visca device this plugin talks to
@@ -44,7 +42,6 @@ def init():
     recorder = context.get_recorder()
     logger = context.get_logger()
     repo = context.get_repository()
-    # repo = repository.Repository
     config = context.get_conf().get_section(CONFIG_SECTION) or {}
 
     # If port is not defined, a None value will make this method fail
