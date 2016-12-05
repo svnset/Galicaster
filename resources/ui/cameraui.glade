@@ -859,6 +859,9 @@ laden/speichern</property>
                     <property name="tooltip_text" translatable="yes">Nach links-oben bewegen.</property>
                     <property name="hexpand">False</property>
                     <property name="vexpand">False</property>
+                    <child>
+                      <placeholder/>
+                    </child>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
@@ -874,7 +877,9 @@ laden/speichern</property>
                     <property name="tooltip_text" translatable="yes">Nach oben bewegen.</property>
                     <property name="hexpand">False</property>
                     <property name="vexpand">False</property>
-                    <property name="image">upimg</property>
+                    <child>
+                      <placeholder/>
+                    </child>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -890,6 +895,9 @@ laden/speichern</property>
                     <property name="tooltip_text" translatable="yes">Nach rechts-oben bewegen.</property>
                     <property name="hexpand">False</property>
                     <property name="vexpand">False</property>
+                    <child>
+                      <placeholder/>
+                    </child>
                   </object>
                   <packing>
                     <property name="left_attach">2</property>
@@ -905,7 +913,9 @@ laden/speichern</property>
                     <property name="tooltip_text" translatable="yes">Nach rechts bewegen.</property>
                     <property name="hexpand">False</property>
                     <property name="vexpand">False</property>
-                    <property name="image">rightimg</property>
+                    <child>
+                      <placeholder/>
+                    </child>
                   </object>
                   <packing>
                     <property name="left_attach">2</property>
@@ -921,7 +931,9 @@ laden/speichern</property>
                     <property name="tooltip_text" translatable="yes">Nach unten bewegen.</property>
                     <property name="hexpand">False</property>
                     <property name="vexpand">False</property>
-                    <property name="image">downimg</property>
+                    <child>
+                      <placeholder/>
+                    </child>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -937,6 +949,9 @@ laden/speichern</property>
                     <property name="tooltip_text" translatable="yes">Nach links-unten bewegen.</property>
                     <property name="hexpand">False</property>
                     <property name="vexpand">False</property>
+                    <child>
+                      <placeholder/>
+                    </child>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
@@ -952,7 +967,9 @@ laden/speichern</property>
                     <property name="tooltip_text" translatable="yes">Nach links bewegen.</property>
                     <property name="hexpand">False</property>
                     <property name="vexpand">False</property>
-                    <property name="image">leftimg</property>
+                    <child>
+                      <placeholder/>
+                    </child>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
@@ -968,6 +985,9 @@ laden/speichern</property>
                     <property name="tooltip_text" translatable="yes">Nach rechts-unten bewegen.</property>
                     <property name="hexpand">False</property>
                     <property name="vexpand">False</property>
+                    <child>
+                      <placeholder/>
+                    </child>
                   </object>
                   <packing>
                     <property name="left_attach">2</property>

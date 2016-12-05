@@ -7,6 +7,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GObject, Gdk
 from galicaster.core import context
 from galicaster.classui import get_ui_path
+from galicaster.classui import get_image_path
 import galicaster.utils.pysca as pysca
 
 # DEFAULTS
@@ -82,38 +83,64 @@ def init_ui(element):
     notebook.append_page(mainbox, label)
     notebook.show_all()
 
+    # images
+    upimg = Gtk.Image.new_from_file(get_image_path("img/up.svg"))
+    downimg = Gtk.Image.new_from_file(get_image_path("img/down.svg"))
+    rightimg = Gtk.Image.new_from_file(get_image_path("img/right.svg"))
+    rightupimg = Gtk.Image.new_from_file(get_image_path("img/rightup.svg"))
+    rightdownimg = Gtk.Image.new_from_file(get_image_path("img/rightdown.svg"))
+    leftimg = Gtk.Image.new_from_file(get_image_path("img/left.svg"))
+    leftupimg = Gtk.Image.new_from_file(get_image_path("img/leftup.svg"))
+    leftdownimg = Gtk.Image.new_from_file(get_image_path("img/leftdown.svg"))
+    
+    upimg.show()
+    downimg.show()
+    rightimg.show()
+    rightupimg.show()
+    rightdownimg.show()
+    leftimg.show()
+    leftupimg.show()
+    leftdownimg.show()
 
     # buttons
     # movement
     button = builder.get_object("left")
+    button.add(leftimg)
     button.connect("pressed", move_left)
     button.connect("released", stop_move)
 
     button = builder.get_object("leftup")
+    button.add(leftupimg)
     button.connect("pressed", move_leftup)
     button.connect("released", stop_move)
 
     button = builder.get_object("leftdown")
+    button.add(leftdownimg)
     button.connect("pressed", move_leftdown)
     button.connect("released", stop_move)
 
     button = builder.get_object("right")
+    button.add(rightimg)
     button.connect("pressed", move_right)
     button.connect("released", stop_move)
 
     button = builder.get_object("rightup")
+    button.add(rightupimg)
     button.connect("pressed", move_rightup)
     button.connect("released", stop_move)
 
     button = builder.get_object("rightdown")
+    button.add(rightdownimg)
     button.connect("pressed", move_rightdown)
     button.connect("released", stop_move)
 
     button = builder.get_object("up")
+    button.add(upimg)
     button.connect("pressed", move_up)
     button.connect("released", stop_move)
 
     button = builder.get_object("down")
+    button.add(downimg)
     button.connect("pressed", move_down)
     button.connect("released", stop_move)
 
