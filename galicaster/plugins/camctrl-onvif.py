@@ -1,30 +1,20 @@
-# Galicaster-Plugin
-
 import gi
 
-gi.require_version("Gtk", "3.0")
+gi.require_version('Gtk', '3.0')
 
-from gi.repository import Gtk, GObject, Gdk
+from gi.repository import Gtk, Gdk, GObject
 from galicaster.core import context
 from galicaster.classui import get_ui_path
 from galicaster.classui import get_image_path
-import galicaster.utils.pysca as pysca
+import galicaster.utils.camctrl_onvif_interface as camera
 
-# DEFAULTS
-# This is the default Visca device this plugin talks to
-DEFAULT_DEVICE = 1
 
+#DEFAULTS
 # This is the default preset to set when the camera is recording
-DEFAULT_RECORD_PRESET = 0
+DEFAULT_RECORD_PRESET = "record" 
 
 # This is the default preset to set when the camera is switching off
-DEFAULT_IDLE_PRESET = 5
-
-# This is the name of this plugin's section in the configuration file
-CONFIG_SECTION = "cameraui"
-
-# This is the key containing the port (path to the device) to use when recording
-PORT_KEY = "port"
+DEFAULT_IDLE_PRESET = "idle" 
 
 # This is the key containing the preset to use when recording
 RECORD_PRESET_KEY = 'record-preset'
@@ -32,37 +22,42 @@ RECORD_PRESET_KEY = 'record-preset'
 # This is the key containing the preset to set the camera to just after switching it off
 IDLE_PRESET_KEY= 'idle-preset'
 
-#PRESET TO USE WITH OPENCAST
-WORKFLOW_PRESET = "preset"
-
+# This is the name of this plugin's section in the configuration file
+CONFIG_SECTION = "ipui"
 
 def init():
-    global recorder, dispatcher, logger, config, repo
-    
-    dispatcher = context.get_dispatcher()
-    recorder = context.get_recorder()
-    logger = context.get_logger()
-    repo = context.get_repository()
-    config = context.get_conf().get_section(CONFIG_SECTION) or {}
+    global cam, recorder, dispatcher, logger, config, repo
 
-    # If port is not defined, a None value will make this method fail
-    pysca.connect(config.get(PORT_KEY))
+# connect to the camera
+    ip = '134.95.128.120'
+    username = "root"
+    password = "opencast"
+    
+    cam = camera.AXIS_V5915()
+    cam.connect(ip, username, password)
+
+
+    dispatcher = context.get_dispatcher()
+    repo = context.get_repository()
+    #  repo = repository.Repository()
+    logger = context.get_logger()
+    config = context.get_conf().get_section(CONFIG_SECTION) or {}
 
 
     dispatcher.connect("init", init_ui)
-    dispatcher.connect('recorder-starting', on_start_recording)
-    dispatcher.connect('recorder-stopped', on_stop_recording)
+    dispatcher.connect("recorder-starting", on_start_recording)
+    dispatcher.connect("recorder-stopped", on_stop_recording)
     logger.info("Cam connected")
 
 
 def init_ui(element):
-    global recorder_ui, brightscale, movescale, zoomscale, presetbutton, flybutton, builder, onoffbutton, prefbutton
+    global recorder_ui, brightscale, movescale, zoomscale, presetlist, presetdelbutton, flybutton, builder, prefbutton, newpreset
 
     recorder_ui = context.get_mainwindow().nbox.get_nth_page(0).gui
 
-    # load css file
+# load css file
     css = Gtk.CssProvider()
-    css.load_from_path(get_ui_path("cameraui.css"))
+    css.load_from_path(get_ui_path("camctrl.css"))
 
     Gtk.StyleContext.reset_widgets(Gdk.Screen.get_default())
     Gtk.StyleContext.add_provider_for_screen(
@@ -73,8 +68,8 @@ def init_ui(element):
 
     # load glade file
     builder = Gtk.Builder()
-    builder.add_from_file(get_ui_path("cameraui.glade"))
-
+    builder.add_from_file(get_ui_path("camctrl-onvif.glade"))
+    
     # add new settings tab to the notebook
     notebook = recorder_ui.get_object("data_panel")
     mainbox = builder.get_object("mainbox")
@@ -92,7 +87,8 @@ def init_ui(element):
     leftimg = Gtk.Image.new_from_file(get_image_path("img/left.svg"))
     leftupimg = Gtk.Image.new_from_file(get_image_path("img/leftup.svg"))
     leftdownimg = Gtk.Image.new_from_file(get_image_path("img/leftdown.svg"))
-    
+    #  homeimg = Gtk.Image.new_from_file(get_image_path("img/home.svg")) 
+
     upimg.show()
     downimg.show()
     rightimg.show()
@@ -101,6 +97,7 @@ def init_ui(element):
     leftimg.show()
     leftupimg.show()
     leftdownimg.show()
+    #  homeimg.show()
 
     # buttons
     # movement
@@ -145,225 +142,210 @@ def init_ui(element):
     button.connect("released", stop_move)
 
     button = builder.get_object("home")
+    #  button.add(homeimg)
     button.connect("clicked", move_home)
 
-    # zoom
+# zoom
     button = builder.get_object("zoomin")
     button.connect("pressed", zoom_in)
-    button.connect("released", stop_zoom)
+    button.connect("released", stop_move)
 
     button = builder.get_object("zoomout")
     button.connect("pressed", zoom_out)
-    button.connect("released", stop_zoom)
+    button.connect("released", stop_move)
 
-    # presets
-    button = builder.get_object("1")
-    button.connect("clicked", preset1)
+# presets
+    presetlist = builder.get_object("preset_list")
+    # add home position to list
+    presetlist.insert(0,"home","home")
+    # fill the list with current presets
+    for preset in cam.getPresets():
+        presetlist.append(preset.Name, preset.Name)
+    presetlist.connect("changed", change_preset)
 
-    button = builder.get_object("2")
-    button.connect("clicked", preset2)
+# to set a new preset
+    newpreset = builder.get_object("newpreset")
+    newpreset.connect("activate", save_preset)
+    newpreset.connect("icon-press", save_preset_icon)
 
-    button = builder.get_object("3")
-    button.connect("clicked", preset3)
 
-    button = builder.get_object("4")
-    button.connect("clicked", preset4)
+# to delete a preset
+    presetdelbutton = builder.get_object("presetdel")
+    presetdelbutton.connect("clicked", empty_entry)
 
-    button = builder.get_object("5")
-    button.connect("clicked", preset5)
-
-    button = builder.get_object("6")
-    button.connect("clicked", preset6)
-
-    # to set a new preset
-    presetbutton = builder.get_object("preset")
-
-    # fly-mode for camera-movement
+# fly-mode for camera-movement
     flybutton = builder.get_object("fly")
     flybutton.connect("clicked", fly_mode)
 
-    # on-off button
-    onoffbutton = builder.get_object("on-off")
-    onoffbutton.connect("state-set", turn_on_off)
-
-    # reset all settings
+# reset all settings
     button = builder.get_object("reset")
     button.connect("clicked", reset)
 
-    # show/hide preferences
+# show/hide preferences
     prefbutton = builder.get_object("pref")
     prefbutton.connect("clicked", show_pref)
 
-    # scales
-    brightscale = builder.get_object("brightscale")
-    brightscale.connect("value-changed", set_bright)
+# scales
+    #  brightscale = builder.get_object("brightscale")
+    #  brightscale.connect("value-changed", set_bright)
     movescale = builder.get_object("movescale")
     zoomscale = builder.get_object("zoomscale")
     
+
 # camera functions
 
 # movement functions
 def move_left(button):
     print ("I move left")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=-movescale.get_value())
+    cam.goLeft(movescale.get_value())
+    presetlist.set_active(-1)
 
 
 def move_leftup(button):
     print ("I move leftup")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=-movescale.get_value(), tilt=movescale.get_value())
+    cam.goLeftUp(movescale.get_value())
+    presetlist.set_active(-1)
 
 
 def move_leftdown(button):
     print ("I move leftdown")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=-movescale.get_value(), tilt=-movescale.get_value())
+    cam.goLeftDown(movescale.get_value())
+    presetlist.set_active(-1)
 
 
 def move_right(button):
     print ("I move right")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=movescale.get_value())
+    cam.goRight(movescale.get_value())
+    presetlist.set_active(-1)
 
 
 def move_rightup(button):
     print ("I move rightup")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=movescale.get_value(), tilt=movescale.get_value())
+    cam.goRightUp(movescale.get_value())
+    presetlist.set_active(-1)
 
 
 def move_rightdown(button):
     print ("I move rightdown")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=movescale.get_value(), tilt=-movescale.get_value())
+    cam.goRightDown(movescale.get_value())
+    presetlist.set_active(-1)
 
 
 def move_up(button):
     print ("I move up")
-    pysca.pan_tilt(DEFAULT_DEVICE, tilt=movescale.get_value())
+    cam.goUp(movescale.get_value())
+    presetlist.set_active(-1)
 
 
 def move_down(button):
     print ("I move down")
-    pysca.pan_tilt(DEFAULT_DEVICE, tilt=-movescale.get_value())
+    cam.goDown(movescale.get_value())
+    presetlist.set_active(-1)
 
 
 def stop_move(button):
     print ("I make a break")
-    pysca.pan_tilt(DEFAULT_DEVICE, pan=0, tilt=0)
+    cam.stop()
 
 
 def move_home(button):
     print ("I move home")
-    pysca.pan_tilt_home(DEFAULT_DEVICE)
+    presetlist.set_active_id("home")
 
 
 # zoom functions
 def zoom_in(button):
     print ("zoom in")
-    pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_TELE, speed=zoomscale.get_value())
+    cam.zoom_in(zoomscale.get_value())
+    presetlist.set_active(-1)
 
 
 def zoom_out(button):
     print ("zoom out")
-    pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_WIDE, speed=zoomscale.get_value())
-
-
-def stop_zoom(button):
-    print ("stop zoom")
-    pysca.zoom(DEFAULT_DEVICE, pysca.ZOOM_ACTION_STOP)
+    cam.zoom_out(zoomscale.get_value())
+    presetlist.set_active(-1)
 
 
 # preset functions
-def preset1(button):
-    if presetbutton.get_active():
-        pysca.set_memory(DEFAULT_DEVICE, 0)
-        presetbutton.set_active(False)
+def change_preset(presetlist):
+    if len(newpreset.get_text()) > 0:
+        if newpreset.get_text() == "home":
+            print ("New Home set to current position.")
+        else:
+            print("New Preset saved: ", newpreset.get_text())
+    elif presetlist.get_active_text() == "home":
+        print("Going Home")
+        cam.goHome()        
     else:
-        pysca.recall_memory(DEFAULT_DEVICE, 0)
+        if presetdelbutton.get_active() and not presetlist.get_active_text() is None:
+            cam.removePreset(cam.identifyPreset(presetlist.get_active_text()))
+            presetdelbutton.set_active(False)
+            presetlist.remove(presetlist.get_active())
+            
+        else:
+            if not presetlist.get_active_text() is None:
+                print("Going to: " + presetlist.get_active_text())
+                cam.goToPreset(cam.identifyPreset(presetlist.get_active_text()))
 
 
-def preset2(button):
-    if presetbutton.get_active():
-        pysca.set_memory(DEFAULT_DEVICE, 1)
-        presetbutton.set_active(False)
+def empty_entry(presetdelbutton):
+    if presetdelbutton.get_active():
+        presetlist.set_active(-1)
+        presetlist.remove(0)
+    elif not presetdelbutton.get_active():
+        presetlist.insert(0,"home","home")
+
+
+def save_preset_icon(newpreset, pos, event):
+    if newpreset.get_text() == "home":
+        cam.setHome()
+        presetlist.set_active_id(newpreset.get_text())
+        newpreset.set_text("")
     else:
-        pysca.recall_memory(DEFAULT_DEVICE, 1)
+        cam.setPreset(newpreset.get_text())
+        presetlist.append(newpreset.get_text(), newpreset.get_text())
+        presetlist.set_active_id(newpreset.get_text())
+        newpreset.set_text("")
 
 
-def preset3(button):
-    if presetbutton.get_active():
-        pysca.set_memory(DEFAULT_DEVICE, 2)
-        presetbutton.set_active(False)
+def save_preset(newpreset):
+    if newpreset.get_text() == "home":
+        cam.setHome()
+        presetlist.set_active_id(newpreset.get_text())
+        newpreset.set_text("")
     else:
-        pysca.recall_memory(DEFAULT_DEVICE, 2)
-
-
-def preset4(button):
-    if presetbutton.get_active():
-        pysca.set_memory(DEFAULT_DEVICE, 3)
-        presetbutton.set_active(False)
-    else:
-        pysca.recall_memory(DEFAULT_DEVICE, 3)
-
-
-def preset5(button):
-    if presetbutton.get_active():
-        pysca.set_memory(DEFAULT_DEVICE, 4)
-        presetbutton.set_active(False)
-    else:
-        pysca.recall_memory(DEFAULT_DEVICE, 4)
-
-
-def preset6(button):
-    if presetbutton.get_active():
-        pysca.set_memory(DEFAULT_DEVICE, 5)
-        presetbutton.set_active(False)
-    else:
-        pysca.recall_memory(DEFAULT_DEVICE, 5)
+        cam.setPreset(newpreset.get_text())
+        presetlist.append(newpreset.get_text(), newpreset.get_text())
+        presetlist.set_active_id(newpreset.get_text())
+        newpreset.set_text("")
 
 
 # brightness scale
 def set_bright(brightscale):
-    pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
-    pysca.set_brightness(DEFAULT_DEVICE, brightscale.get_value() + 15)
-
+    return None
 
 # reset all settings
 def reset(button):
-    # reset brightness
-    pysca.set_ae_mode(DEFAULT_DEVICE, pysca.AUTO_EXPOSURE_BRIGHT_MODE)
-    pysca.set_brightness(DEFAULT_DEVICE, 15)
-    brightscale.set_value(0)
-    movescale.set_value(7)
-    zoomscale.set_value(3.5)
-    # reset zoom
-    pysca.set_zoom(DEFAULT_DEVICE, 0000)
+    movescale.set_value(0.5)
+    zoomscale.set_value(0.5)
     # reset location
-    pysca.pan_tilt_home(DEFAULT_DEVICE)
-
-
-# turns the camera on/off
-def turn_on_off(onoffbutton, self):
-    if onoffbutton.get_active():
-        pysca.set_power_on(DEFAULT_DEVICE, True)
-    else:
-        pysca.set_power_on(DEFAULT_DEVICE, False)
+    cam.goHome()
 
 
 # hides/shows the advanced preferences
 def show_pref(prefbutton):
     scalebox1 = builder.get_object("scales1")
     scalebox2 = builder.get_object("scales2")
-    scalebox3 = builder.get_object("scales3")
     # settings button activated
     if scalebox1.get_property("visible"):
         print ("hide advanced settings")
         scalebox1.hide()
         scalebox2.hide()
-        scalebox3.hide()
     # settings button deactivated
     else:
         print ("show advanced settings")
         scalebox1.show()
         scalebox2.show()
-        scalebox3.show()
-
 
 
 # flymode activation connects clicked signal and disconnects
@@ -409,7 +391,6 @@ def fly_mode(flybutton):
         GObject.signal_handlers_destroy(button)
         button.set_image(img)
         button.connect("clicked", stop_move)
-
 
     # fly mode turned off
     else:
@@ -463,29 +444,27 @@ def fly_mode(flybutton):
 
 
 def on_start_recording(elem):
-
+    
     preset = config.get(RECORD_PRESET_KEY, DEFAULT_RECORD_PRESET)
     mp = repo.get_next_mediapackage()
 
     if mp is not None:
         properties = mp.getOCCaptureAgentProperties()
-        preset = int(properties['org.opencastproject.workflow.config.cameraPreset'])
+        preset = properties['org.opencastproject.workflow.config.cameraPreset']
 
     try:
-        pysca.set_power_on(DEFAULT_DEVICE, True, ) 
-        onoffbutton.set_active(True)
-        pysca.recall_memory(DEFAULT_DEVICE, (preset))
+        presetlist.set_active_id(preset)
+        #  cam.goToPreset(cam.identifyPreset(preset))
 
     except Exception as e:
-        logger.warn("Error accessing the Visca device %u on recording start. The recording may be incorrect! Error: %s" % (DEFAULT_DEVICE, e))
+        logger.warn("Error accessing the IP camera on recording start. The recording may be incorrect! Error:", e)
 
 
 def on_stop_recording(elem, elem2):
 
     try:
-        pysca.recall_memory(DEFAULT_DEVICE, config.get(IDLE_PRESET_KEY, DEFAULT_IDLE_PRESET))
-        pysca.set_power_on(DEFAULT_DEVICE, False)
-        onoffbutton.set_active(False)
+        presetlist.set_active_id(config.get(IDLE_PRESET_KEY, DEFAULT_IDLE_PRESET))
+        #  cam.goToPreset(cam.identifyPreset(config.get(IDLE_PRESET_KEY, DEFAULT_IDLE_PRESET)))
 
     except Exception as e:
-        logger.warn("Error accessing the Visca device %u on recording end. The recording may be incorrect! Error: %s" % (DEFAULT_DEVICE, e))
+        logger.warn("Error accessing the IP camera on recording end. The recording may be incorrect! Error: ", e)
