@@ -817,41 +817,41 @@ def fly_mode_onvif(flybutton):
         print ("fly mode turned on")
         button = builder.get_object("left")
         GObject.signal_handlers_destroy(button)
-        button.connect("clicked", move_left)
+        button.connect("clicked", move_left_onvif)
 
         button = builder.get_object("leftup")
         GObject.signal_handlers_destroy(button)
-        button.connect("clicked", move_leftup)
+        button.connect("clicked", move_leftup_onvif)
 
         button = builder.get_object("leftdown")
         GObject.signal_handlers_destroy(button)
-        button.connect("clicked", move_leftdown)
+        button.connect("clicked", move_leftdown_onvif)
 
         button = builder.get_object("right")
         GObject.signal_handlers_destroy(button)
-        button.connect("clicked", move_right)
+        button.connect("clicked", move_right_onvif)
 
         button = builder.get_object("rightup")
         GObject.signal_handlers_destroy(button)
-        button.connect("clicked", move_rightup)
+        button.connect("clicked", move_rightup_onvif)
 
         button = builder.get_object("rightdown")
         GObject.signal_handlers_destroy(button)
-        button.connect("clicked", move_rightdown)
+        button.connect("clicked", move_rightdown_onvif)
 
         button = builder.get_object("up")
         GObject.signal_handlers_destroy(button)
-        button.connect("clicked", move_up)
+        button.connect("clicked", move_up_onvif)
 
         button = builder.get_object("down")
         GObject.signal_handlers_destroy(button)
-        button.connect("clicked", move_down)
+        button.connect("clicked", move_down_onvif)
 
         button = builder.get_object("home")
         img = builder.get_object("stopimg")
         GObject.signal_handlers_destroy(button)
         button.set_image(img)
-        button.connect("clicked", stop_move)
+        button.connect("clicked", stop_move_onvif)
 
     # fly mode turned off
     else:
@@ -859,49 +859,49 @@ def fly_mode_onvif(flybutton):
 
         button = builder.get_object("left")
         GObject.signal_handlers_destroy(button)
-        button.connect("pressed", move_left)
-        button.connect("released", stop_move)
+        button.connect("pressed", move_left_onvif)
+        button.connect("released", stop_move_onvif)
 
         button = builder.get_object("leftup")
         GObject.signal_handlers_destroy(button)
-        button.connect("pressed", move_leftup)
-        button.connect("released", stop_move)
+        button.connect("pressed", move_leftup_onvif)
+        button.connect("released", stop_move_onvif)
 
         button = builder.get_object("leftdown")
         GObject.signal_handlers_destroy(button)
-        button.connect("pressed", move_leftdown)
-        button.connect("released", stop_move)
+        button.connect("pressed", move_leftdown_onvif)
+        button.connect("released", stop_move_onvif)
 
         button = builder.get_object("right")
         GObject.signal_handlers_destroy(button)
-        button.connect("pressed", move_right)
-        button.connect("released", stop_move)
+        button.connect("pressed", move_right_onvif)
+        button.connect("released", stop_move_onvif)
 
         button = builder.get_object("rightup")
         GObject.signal_handlers_destroy(button)
-        button.connect("pressed", move_rightup)
-        button.connect("released", stop_move)
+        button.connect("pressed", move_rightup_onvif)
+        button.connect("released", stop_move_onvif)
 
         button = builder.get_object("rightdown")
         GObject.signal_handlers_destroy(button)
-        button.connect("pressed", move_rightdown)
-        button.connect("released", stop_move)
+        button.connect("pressed", move_rightdown_onvif)
+        button.connect("released", stop_move_onvif)
 
         button = builder.get_object("up")
         GObject.signal_handlers_destroy(button)
-        button.connect("pressed", move_up)
-        button.connect("released", stop_move)
+        button.connect("pressed", move_up_onvif)
+        button.connect("released", stop_move_onvif)
 
         button = builder.get_object("down")
         GObject.signal_handlers_destroy(button)
-        button.connect("pressed", move_down)
-        button.connect("released", stop_move)
+        button.connect("pressed", move_down_onvif)
+        button.connect("released", stop_move_onvif)
 
         button = builder.get_object("home")
         img = builder.get_object("homeimg")
         GObject.signal_handlers_destroy(button)
         button.set_image(img)
-        button.connect("clicked", move_home)
+        button.connect("clicked", move_home_onvif)
 
 
 def on_start_recording_onvif(elem):
